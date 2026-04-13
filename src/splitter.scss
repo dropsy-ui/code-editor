@@ -23,9 +23,25 @@
 
       .splitter {
         cursor: col-resize;
-        width: 6px;
-        background: var(--app-border-color);
+        width: 0.75rem;
+        flex: 0 0 0.75rem;
+        position: relative;
+        background: transparent;
         z-index: 2;
+
+        &::before {
+          content: "";
+          position: absolute;
+          inset: 0.35rem 0.25rem;
+          border-radius: 999px;
+          background: linear-gradient(180deg, rgba(90, 98, 114, 0.95), rgba(58, 64, 76, 0.95));
+          transition: background 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        &:hover::before {
+          background: linear-gradient(180deg, rgba(125, 211, 252, 0.85), rgba(59, 130, 246, 0.85));
+          box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.16);
+        }
       }
 
       .preview-section {

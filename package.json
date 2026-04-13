@@ -14,7 +14,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/life4aiur/code-editor.git"
+    "url": "git+https://github.com/dropsy-ui/code-editor.git"
   },
   "keywords": [
     "code-editor",
@@ -22,11 +22,11 @@
     "embeddable",
     "live-preview"
   ],
-  "author": "Your Name",
+  "author": "Andrew St. Jean",
   "license": "MIT",
-  "homepage": "https://github.com/life4aiur/code-editor#readme",
+  "homepage": "https://github.com/dropsy-ui/code-editor#readme",
   "bugs": {
-    "url": "https://github.com/life4aiur/code-editor/issues"
+    "url": "https://github.com/dropsy-ui/code-editor/issues"
   },
   "publishConfig": {
     "access": "public"

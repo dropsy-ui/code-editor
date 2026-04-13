@@ -13,12 +13,14 @@ interface EditorHeaderProps {
 export function EditorHeader({ title, onClear, onCollapse, isCollapsed }: EditorHeaderProps) {
   return (
     <div className="editor-header">
-      <span>{title}</span>
+      <div className="editor-header-title-group">
+        <span className="editor-header-title">{title}</span>
+      </div>
       <div className="editor-header-actions">
         {onCollapse && (
           <button
             onClick={onCollapse}
-            className="app-btn"
+            className="app-btn editor-header-btn"
             aria-label={isCollapsed ? 'Expand' : 'Collapse'}
             type="button"
           >
@@ -28,7 +30,7 @@ export function EditorHeader({ title, onClear, onCollapse, isCollapsed }: Editor
           </button>
         )}
         <button
-          onClick={onClear} className="app-btn"
+          onClick={onClear} className="app-btn editor-header-btn"
           aria-label="Clear"
           type="button"
         >

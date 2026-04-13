@@ -117,7 +117,7 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
             />
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="app-btn"
+              className="app-btn live-preview-btn"
               aria-label="Load file"
             >
               <img src={Upload} alt="Upload" />
@@ -125,20 +125,22 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
             <button
               id="live-save-button"
               onClick={onSave}
-              className="app-btn"
+              className="app-btn live-preview-btn"
               aria-label="Save file"
             >
               <img src={Save} alt="Save" />
             </button>
           </div>
         </div>
-        <iframe
-          ref={ref}
-          title="Live Preview"
-          className="live-preview-iframe"
-          sandbox="allow-scripts"
-          srcDoc={srcdoc}
-        />
+        <div className="live-preview-stage">
+          <iframe
+            ref={ref}
+            title="Live Preview"
+            className="live-preview-iframe"
+            sandbox="allow-scripts"
+            srcDoc={srcdoc}
+          />
+        </div>
       </div>
     );
   }
