@@ -5,9 +5,16 @@ import LivePreview from "./LivePreview";
 interface PreviewSectionProps {
   iframeScripts?: string[];
   iframeStyles?: string[];
+  layoutMode: "full" | "compact";
+  onOpenLayoutInNewWindow: (mode: "full" | "compact") => void;
 }
 
-const PreviewSection = ({ iframeScripts = [], iframeStyles = [] }: PreviewSectionProps) => {
+const PreviewSection = ({
+  iframeScripts = [],
+  iframeStyles = [],
+  layoutMode,
+  onOpenLayoutInNewWindow,
+}: PreviewSectionProps) => {
   const { htmlCode, jsCode, cssCode, setHtmlCode, setJsCode, setCssCode } = useCodeEditorStore();
   return (
     <>
@@ -18,6 +25,8 @@ const PreviewSection = ({ iframeScripts = [], iframeStyles = [] }: PreviewSectio
           cssCode={cssCode}
           iframeScripts={iframeScripts}
           iframeStyles={iframeStyles}
+          layoutMode={layoutMode}
+          onOpenLayoutInNewWindow={onOpenLayoutInNewWindow}
           onUpload={e => {
             const file = e.target.files?.[0];
             if (!file) return;

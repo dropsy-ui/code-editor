@@ -63,3 +63,12 @@
     }
   }
 }
+
+.app-body.app-body--compact {
+  height: auto;
+
+  .app-main.app-main--compact {
+    height: auto;
+    min-height: 0;
+  }
+}
