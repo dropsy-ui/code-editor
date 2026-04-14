@@ -2,16 +2,20 @@
 
 This project uses [semantic-release](https://semantic-release.gitbook.io/) to automate versioning, changelog generation, and publishing to npm and GitHub.
 
-## How Releases Work
+## Release Trigger
 
-- **Versioning**: The version is automatically determined based on commit messages following the [Conventional Commits](https://www.conventionalcommits.org/) specification.
-- **Changelog**: A changelog is generated and updated in `CHANGELOG.md`.
-- **Publishing**: Publishing only occurs when `main` is merged into `develop`. The GitHub Actions workflow will:
-  - Run semantic-release on the `develop` branch
-  - Update the changelog and version in `main`
-  - Merge the release changes from `main` back into `develop` so the changelog and version are synced
-  - Publish a new release to npm (if needed)
-  - Create a GitHub release
+Releases run from the GitHub Actions workflow on pushes to `main`.
+
+Workflow file: `.github/workflows/release.yml`
+
+After a successful release, the workflow merges `main` back into `develop`.
+
+## How Versioning Works
+
+- Commit messages are parsed using [Conventional Commits](https://www.conventionalcommits.org/).
+- `semantic-release` determines the next version automatically.
+- Changelog entries are generated and committed to `CHANGELOG.md`.
+- npm and GitHub releases are created by semantic-release plugins.
 
 ## Commit Message Format
 
@@ -22,15 +26,22 @@ All commits must follow Conventional Commits. Example formats:
 - `docs: update README`
 - `chore: update dependencies`
 
-## Setting Up NPM Publishing
+## Required Secrets
 
 1. Generate an npm access token (automation type recommended) from your npm account settings.
 2. In your GitHub repo, go to **Settings > Secrets and variables > Actions**.
 3. Add a new secret named `NPM_TOKEN` and paste your npm token value.
 
-## Manual Release Trigger
+The workflow also uses `GITHUB_TOKEN` provided by GitHub Actions.
 
-Releases are triggered automatically by merging `main` into `develop` with valid commit messages. No manual steps are required. After a publish, the workflow will push the updated changelog and version from `main` back to `develop`.
+## Branch Configuration
+
+Semantic-release branch config lives in `.releaserc` and includes:
+
+- `main`
+- `develop`
+
+Current CI release execution is triggered on `main` via the workflow.
 
 ## Troubleshooting
 
