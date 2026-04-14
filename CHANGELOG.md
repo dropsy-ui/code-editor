@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/dropsy-ui/code-editor/compare/v1.0.0...v1.0.1) (2026-04-14)
+
+
+### Bug Fixes
+
+* address publishing issues ([916b128](https://github.com/dropsy-ui/code-editor/commit/916b1283ff356508ecf6cf5acadc53123a1932cb))
+
 # 1.0.0 (2026-04-14)
 
 
