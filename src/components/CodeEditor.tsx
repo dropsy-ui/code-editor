@@ -24,6 +24,7 @@ const CodeEditor = ({ expanded, onExpand }: CodeEditorProps) => {
           <Editor
             height="100%"
             defaultLanguage="html"
+            loading={null}
             value={htmlCode}
             onChange={(value) => setHtmlCode(value || "")}
             theme="vs-dark"

@@ -100,9 +100,9 @@ const CompactPreviewLayout = ({
           fitContent
           frameHeight={previewHeight}
           onContentHeightChange={(height) => {
-            setPreviewHeight(
-              clampHeight(height, MIN_PREVIEW_HEIGHT, MAX_PREVIEW_HEIGHT)
-            );
+            const nextHeight = clampHeight(height, MIN_PREVIEW_HEIGHT, MAX_PREVIEW_HEIGHT);
+            // Keep the preview stable when switching layouts: allow growth but avoid sudden shrink.
+            setPreviewHeight((currentHeight) => Math.max(currentHeight, nextHeight));
           }}
           onUpload={(e) => {
             const file = e.target.files?.[0];
@@ -183,6 +183,7 @@ const CompactPreviewLayout = ({
               height={`${drawerHeight - 41}px`}
               defaultLanguage={currentLanguage}
               language={currentLanguage}
+              loading={null}
               value={currentValue}
               onChange={handleChange}
               theme="vs-dark"

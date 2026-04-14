@@ -24,6 +24,7 @@ const CSSEditor = ({ expanded, onExpand }: CSSEditorProps) => {
           <Editor
             height="100%"
             defaultLanguage="css"
+            loading={null}
             value={cssCode}
             onChange={(value) => setCssCode(value || "")}
             theme="vs-dark"

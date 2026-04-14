@@ -24,6 +24,7 @@ const JavaScriptEditor = ({ expanded, onExpand }: JavaScriptEditorProps) => {
           <Editor
             height="100%"
             defaultLanguage="javascript"
+            loading={null}
             value={jsCode}
             onChange={(value) => setJsCode(value || "")}
             theme="vs-dark"

@@ -17,6 +17,7 @@ type LayoutMode = "full" | "compact";
 type CompactEditorTab = "html" | "javascript";
 
 const getInitialLayoutMode = (): LayoutMode => {
+  /* v8 ignore next 3 */
   if (typeof window === "undefined") {
     return "full";
   }
