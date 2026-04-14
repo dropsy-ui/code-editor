@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("compact mode interactions", async ({ page }) => {
-  await page.goto("/?layout=compact");
+  await page.goto("/?demoStandalone=1&layout=compact");
 
   await expect(page.getByTitle("Live Preview")).toBeVisible();
   await page.getByRole("button", { name: "Show code" }).click();

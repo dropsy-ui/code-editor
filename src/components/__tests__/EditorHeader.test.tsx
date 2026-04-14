@@ -17,17 +17,17 @@ describe("EditorHeader", () => {
 
   it("renders collapse button and calls handler", async () => {
     const user = userEvent.setup();
-    const onCollapse = vi.fn();
+    const onToggle = vi.fn();
 
     const { rerender } = render(
-      <EditorHeader title="CSS" onClear={() => undefined} onCollapse={onCollapse} isCollapsed={false} />
+      <EditorHeader title="CSS" onClear={() => undefined} onToggle={onToggle} isCollapsed={false} />
     );
 
     await user.click(screen.getByRole("button", { name: "Collapse" }));
-    expect(onCollapse).toHaveBeenCalledTimes(1);
+    expect(onToggle).toHaveBeenCalledTimes(1);
 
     rerender(
-      <EditorHeader title="CSS" onClear={() => undefined} onCollapse={onCollapse} isCollapsed />
+      <EditorHeader title="CSS" onClear={() => undefined} onToggle={onToggle} isCollapsed />
     );
     expect(screen.getByRole("button", { name: "Expand" })).toBeInTheDocument();
   });

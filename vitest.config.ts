@@ -18,7 +18,6 @@ export default defineConfig({
         "src/demo/**",
         "src/vite-env.d.ts",
         "src/test/**",
-        "src/context/ConsoleStoreContext.tsx",
       ],
       thresholds: {
         statements: 100,

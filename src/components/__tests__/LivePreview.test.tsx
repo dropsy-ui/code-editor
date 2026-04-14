@@ -1,32 +1,13 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { CodeEditorStoreContext, type CodeEditorStore } from "../../context/CodeEditorStore";
 import LivePreview from "../LivePreview";
-
-const store: CodeEditorStore = {
-  htmlCode: "",
-  cssCode: "",
-  jsCode: "",
-  setHtmlCode: () => undefined,
-  setCssCode: () => undefined,
-  setJsCode: () => undefined,
-  logs: [],
-  addLog: vi.fn(),
-  clearLogs: () => undefined,
-};
-
-function wrap(ui: React.ReactElement, overrides: Partial<CodeEditorStore> = {}) {
-  return render(
-    <CodeEditorStoreContext.Provider value={{ ...store, ...overrides }}>
-      {ui}
-    </CodeEditorStoreContext.Provider>
-  );
-}
+import { renderWithCodeStore } from "../../test/helpers";
+import { createJsonFile } from "../../test/fixtures/files";
 
 describe("LivePreview", () => {
   it("builds srcdoc with html/css/js and external assets", () => {
-    wrap(
+    renderWithCodeStore(
       <LivePreview
         htmlCode="<h1>Demo</h1>"
         cssCode="h1 { color: red; }"
@@ -45,7 +26,7 @@ describe("LivePreview", () => {
   });
 
   it("shows invalid-HTML error srcdoc when markup is malformed", () => {
-    wrap(<LivePreview htmlCode="<b>unclosed" cssCode="" jsCode="" />);
+    renderWithCodeStore(<LivePreview htmlCode="<b>unclosed" cssCode="" jsCode="" />);
 
     const iframe = screen.getByTitle("Live Preview") as HTMLIFrameElement;
     expect(iframe.srcdoc).toContain("Invalid HTML provided");
@@ -57,7 +38,7 @@ describe("LivePreview", () => {
     const onUpload = vi.fn();
     const clickSpy = vi.spyOn(HTMLInputElement.prototype, "click");
 
-    wrap(<LivePreview htmlCode="" cssCode="" jsCode="" onSave={onSave} onUpload={onUpload} />);
+    renderWithCodeStore(<LivePreview htmlCode="" cssCode="" jsCode="" onSave={onSave} onUpload={onUpload} />);
 
     await user.click(screen.getByRole("button", { name: "Save file" }));
     expect(onSave).toHaveBeenCalledTimes(1);
@@ -66,7 +47,7 @@ describe("LivePreview", () => {
     expect(clickSpy).toHaveBeenCalled();
 
     const fileInput = document.querySelector("input[type='file']") as HTMLInputElement;
-    const file = new File(["{}"], "demo.json", { type: "application/json" });
+    const file = createJsonFile({}, "demo.json");
     await user.upload(fileInput, file);
 
     await waitFor(() => {
@@ -80,7 +61,7 @@ describe("LivePreview", () => {
     const onContentHeightChange = vi.fn();
     const addLog = vi.fn();
 
-    wrap(<LivePreview htmlCode="" cssCode="" jsCode="" onContentHeightChange={onContentHeightChange} />, { addLog });
+    renderWithCodeStore(<LivePreview htmlCode="" cssCode="" jsCode="" onContentHeightChange={onContentHeightChange} />, { addLog });
 
     window.dispatchEvent(new MessageEvent("message", { data: { type: "console", level: "log", message: "ok" } }));
     window.dispatchEvent(new MessageEvent("message", { data: { type: "preview-height", height: 320 } }));
@@ -93,7 +74,7 @@ describe("LivePreview", () => {
     const onContentHeightChange = vi.fn();
     const addLog = vi.fn();
 
-    wrap(<LivePreview htmlCode="" cssCode="" jsCode="" onContentHeightChange={onContentHeightChange} />, { addLog });
+    renderWithCodeStore(<LivePreview htmlCode="" cssCode="" jsCode="" onContentHeightChange={onContentHeightChange} />, { addLog });
 
     window.dispatchEvent(new MessageEvent("message", { data: { type: "unknown" } }));
     window.dispatchEvent(new MessageEvent("message", { data: { type: "preview-height", height: "not-a-number" } }));
@@ -106,7 +87,7 @@ describe("LivePreview", () => {
     const user = userEvent.setup();
     const onOpenLayoutInNewWindow = vi.fn();
 
-    wrap(
+    renderWithCodeStore(
       <LivePreview
         htmlCode=""
         cssCode=""
@@ -124,7 +105,7 @@ describe("LivePreview", () => {
   });
 
   it("applies fitContent classes and frameHeight style", () => {
-    wrap(
+    renderWithCodeStore(
       <LivePreview
         htmlCode=""
         cssCode=""

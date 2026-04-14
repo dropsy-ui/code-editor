@@ -3,6 +3,8 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { CodeEditorStoreProvider } from "../../context/CodeStoreContext";
 import PreviewSection from "../PreviewSection";
+import { sandboxStateFixtures } from "../../test/fixtures/files";
+import { createConsoleErrorSpy } from "../../test/helpers";
 
 function renderSection() {
   return render(
@@ -49,15 +51,14 @@ describe("PreviewSection", () => {
     renderSection();
 
     const fileInput = document.querySelector("input[type='file']") as HTMLInputElement;
-    const content = JSON.stringify({ html: "<h2>Loaded</h2>", javascript: "var x=1;", css: "h2{}" });
-    const file = new File([content], "state.json", { type: "application/json" });
+    const file = sandboxStateFixtures.valid();
     await user.upload(fileInput, file);
 
     await waitFor(() => {
       const iframe = screen.getByTitle("Live Preview") as HTMLIFrameElement;
-      expect(iframe.srcdoc).toContain("<h2>Loaded</h2>");
-      expect(iframe.srcdoc).toContain("var x=1;");
-      expect(iframe.srcdoc).toContain("h2{}");
+      expect(iframe.srcdoc).toContain("<p>hi</p>");
+      expect(iframe.srcdoc).toContain("alert(1)");
+      expect(iframe.srcdoc).toContain("body{}");
     });
   });
 
@@ -66,8 +67,7 @@ describe("PreviewSection", () => {
     renderSection();
 
     const fileInput = document.querySelector("input[type='file']") as HTMLInputElement;
-    const content = JSON.stringify({ html: "<h3>Partial</h3>" });
-    const file = new File([content], "partial.json", { type: "application/json" });
+    const file = sandboxStateFixtures.partialHtmlOnly();
     await user.upload(fileInput, file);
 
     await waitFor(() => {
@@ -82,8 +82,7 @@ describe("PreviewSection", () => {
     renderSection();
 
     const fileInput = document.querySelector("input[type='file']") as HTMLInputElement;
-    const content = JSON.stringify({ javascript: "console.log('x')", css: "body{color:red;}" });
-    const file = new File([content], "partial-no-html.json", { type: "application/json" });
+    const file = sandboxStateFixtures.partialNoHtml();
     await user.upload(fileInput, file);
 
     await waitFor(() => {
@@ -96,11 +95,11 @@ describe("PreviewSection", () => {
 
   it("upload handles invalid JSON gracefully", async () => {
     const user = userEvent.setup();
-    const spy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const spy = createConsoleErrorSpy();
     renderSection();
 
     const fileInput = document.querySelector("input[type='file']") as HTMLInputElement;
-    const file = new File(["not-json"], "bad.json", { type: "application/json" });
+    const file = sandboxStateFixtures.invalid();
     await user.upload(fileInput, file);
 
     await waitFor(() => {

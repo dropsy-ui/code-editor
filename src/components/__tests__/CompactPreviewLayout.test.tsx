@@ -4,6 +4,9 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import CompactPreviewLayout from "../CompactPreviewLayout";
 import { CodeEditorStoreProvider } from "../../context/CodeStoreContext";
+import { sandboxStateFixtures } from "../../test/fixtures/files";
+import { createConsoleErrorSpy } from "../../test/helpers";
+import { __getLastLayoutDimensions, __resetMonacoMockState } from "../../test/mocks/monaco";
 
 function renderLayout(props?: Partial<ComponentProps<typeof CompactPreviewLayout>>) {
   const defaultProps: ComponentProps<typeof CompactPreviewLayout> = {
@@ -45,12 +48,12 @@ describe("CompactPreviewLayout", () => {
 
   it("handles invalid JSON upload gracefully", async () => {
     const user = userEvent.setup();
-    const spy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const spy = createConsoleErrorSpy();
 
     renderLayout();
 
     const fileInput = document.querySelector("input[type='file']") as HTMLInputElement;
-    const file = new File(["not-json"], "bad.json", { type: "application/json" });
+    const file = sandboxStateFixtures.invalid();
     await user.upload(fileInput, file);
 
     await waitFor(() => {
@@ -133,8 +136,7 @@ describe("CompactPreviewLayout", () => {
     renderLayout();
 
     const fileInput = document.querySelector("input[type='file']") as HTMLInputElement;
-    const content = JSON.stringify({ html: "<p>hi</p>", javascript: "alert(1)", css: "body{}" });
-    const file = new File([content], "state.json", { type: "application/json" });
+    const file = sandboxStateFixtures.valid();
     await user.upload(fileInput, file);
 
     // FileReader is async; the mock-monaco value for html editor should update
@@ -160,8 +162,7 @@ describe("CompactPreviewLayout", () => {
     renderLayout();
 
     const fileInput = document.querySelector("input[type='file']") as HTMLInputElement;
-    const content = JSON.stringify({});
-    const file = new File([content], "empty.json", { type: "application/json" });
+    const file = sandboxStateFixtures.empty();
     await user.upload(fileInput, file);
 
     await waitFor(() => {
@@ -183,5 +184,35 @@ describe("CompactPreviewLayout", () => {
     // With height clamped to MAX_PREVIEW_HEIGHT (480), the iframe style should reflect that
     const iframe = document.querySelector("iframe") as HTMLIFrameElement;
     expect(iframe).toBeInTheDocument();
+  });
+
+  it("relayouts with explicit dimensions when container size is available", async () => {
+    __resetMonacoMockState();
+
+    const widthSpy = vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(640);
+    const heightSpy = vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(300);
+
+    renderLayout();
+
+    await waitFor(() => {
+      expect(__getLastLayoutDimensions()).toEqual({ width: 640, height: 300 });
+    });
+
+    widthSpy.mockRestore();
+    heightSpy.mockRestore();
+  });
+
+  it("updates drawer height when active code grows beyond minimum height", async () => {
+    const user = userEvent.setup();
+    renderLayout({ activeTab: "html" });
+
+    const editor = screen.getByTestId("mock-monaco-editor");
+    await user.clear(editor);
+    await user.type(editor, "l1{enter}l2{enter}l3{enter}l4{enter}l5{enter}l6");
+
+    await waitFor(() => {
+      const drawerEditor = document.querySelector(".compact-code-drawer-editor") as HTMLDivElement;
+      expect(drawerEditor.style.height).toBe("132px");
+    });
   });
 });

@@ -1,5 +1,17 @@
 import { useEffect, useRef } from "react";
 
+type LayoutDimensions = { width: number; height: number };
+
+let lastLayoutDimensions: LayoutDimensions | null = null;
+
+export function __resetMonacoMockState() {
+  lastLayoutDimensions = null;
+}
+
+export function __getLastLayoutDimensions() {
+  return lastLayoutDimensions;
+}
+
 type EditorProps = {
   value?: string;
   defaultLanguage?: string;
@@ -7,7 +19,7 @@ type EditorProps = {
   onChange?: (value: string | undefined) => void;
   onMount?: (editor: {
     getContentHeight: () => number;
-    layout: () => void;
+    layout: (dimensions?: LayoutDimensions) => void;
     onDidContentSizeChange: (callback: () => void) => { dispose: () => void };
   }) => void;
   height?: string;
@@ -28,7 +40,9 @@ export default function MockMonacoEditor({
 
     const editor = {
       getContentHeight: () => 280,
-      layout: () => undefined,
+      layout: (dimensions?: LayoutDimensions) => {
+        lastLayoutDimensions = dimensions ?? null;
+      },
       onDidContentSizeChange: (callback: () => void) => {
         callbackRef.current = callback;
         return { dispose: () => { callbackRef.current = null; } };

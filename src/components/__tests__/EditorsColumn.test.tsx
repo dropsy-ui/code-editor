@@ -1,15 +1,13 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { CodeEditorStoreProvider } from "../../context/CodeStoreContext";
 import EditorsColumn from "../EditorsColumn";
+import { renderWithStoreProvider } from "../../test/helpers";
 
 describe("EditorsColumn", () => {
   it("renders all three editor headers", () => {
-    render(
-      <CodeEditorStoreProvider>
-        <EditorsColumn expanded={{ html: true, js: true, css: true }} setExpanded={vi.fn()} />
-      </CodeEditorStoreProvider>
+    renderWithStoreProvider(
+      <EditorsColumn expanded={{ html: true, js: true, css: true }} setExpanded={vi.fn()} />
     );
 
     expect(screen.getByText("HTML")).toBeInTheDocument();
@@ -18,25 +16,21 @@ describe("EditorsColumn", () => {
   });
 
   it("applies collapsed style when an editor is collapsed", () => {
-    render(
-      <CodeEditorStoreProvider>
-        <EditorsColumn expanded={{ html: false, js: true, css: true }} setExpanded={vi.fn()} />
-      </CodeEditorStoreProvider>
+    renderWithStoreProvider(
+      <EditorsColumn expanded={{ html: false, js: true, css: true }} setExpanded={vi.fn()} />
     );
 
-    const sections = document.querySelectorAll(".editor-section");
-    expect(sections.length).toBe(3);
-    expect((sections[0] as HTMLDivElement).style.maxHeight).toBe("40px");
+    const htmlSection = screen.getByText("HTML").closest(".editor-section") as HTMLDivElement | null;
+    expect(htmlSection).not.toBeNull();
+    expect(htmlSection?.style.maxHeight).toBe("40px");
   });
 
   it("calls setExpanded via onExpand callback", async () => {
     const user = userEvent.setup();
     const setExpanded = vi.fn();
 
-    render(
-      <CodeEditorStoreProvider>
-        <EditorsColumn expanded={{ html: true, js: true, css: true }} setExpanded={setExpanded} />
-      </CodeEditorStoreProvider>
+    renderWithStoreProvider(
+      <EditorsColumn expanded={{ html: true, js: true, css: true }} setExpanded={setExpanded} />
     );
 
     // First collapse button belongs to HTML header
@@ -67,15 +61,19 @@ describe("EditorsColumn", () => {
   });
 
   it("uses 0% flex basis when all editors are collapsed", () => {
-    render(
-      <CodeEditorStoreProvider>
-        <EditorsColumn expanded={{ html: false, js: false, css: false }} setExpanded={vi.fn()} />
-      </CodeEditorStoreProvider>
+    renderWithStoreProvider(
+      <EditorsColumn expanded={{ html: false, js: false, css: false }} setExpanded={vi.fn()} />
     );
 
-    const sections = document.querySelectorAll(".editor-section");
-    expect((sections[0] as HTMLDivElement).style.maxHeight).toBe("40px");
-    expect((sections[1] as HTMLDivElement).style.maxHeight).toBe("40px");
-    expect((sections[2] as HTMLDivElement).style.maxHeight).toBe("40px");
+    const htmlSection = screen.getByText("HTML").closest(".editor-section") as HTMLDivElement | null;
+    const jsSection = screen.getByText("JavaScript").closest(".editor-section") as HTMLDivElement | null;
+    const cssSection = screen.getByText("CSS").closest(".editor-section") as HTMLDivElement | null;
+
+    expect(htmlSection).not.toBeNull();
+    expect(jsSection).not.toBeNull();
+    expect(cssSection).not.toBeNull();
+    expect(htmlSection?.style.maxHeight).toBe("40px");
+    expect(jsSection?.style.maxHeight).toBe("40px");
+    expect(cssSection?.style.maxHeight).toBe("40px");
   });
 });

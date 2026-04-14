@@ -30,13 +30,13 @@ describe("App layout mode", () => {
 
   it("shows drag overlay while splitter is dragging", () => {
     setSearch("");
-    render(<App />);
+    const { container } = render(<App />);
 
-    expect(screen.queryByRole("presentation")).toBeNull();
-    fireEvent.mouseDown(document.querySelector(".splitter")!);
-    expect(document.querySelector(".app-drag-overlay")).toBeInTheDocument();
+    expect(container.querySelector(".app-drag-overlay")).toBeNull();
+    fireEvent.mouseDown(container.querySelector(".splitter")!);
+    expect(container.querySelector(".app-drag-overlay")).toBeInTheDocument();
     fireEvent.mouseUp(window);
-    expect(document.querySelector(".app-drag-overlay")).not.toBeInTheDocument();
+    expect(container.querySelector(".app-drag-overlay")).toBeNull();
   });
 
   it("opens layout in new window via layout buttons", () => {
@@ -54,6 +54,32 @@ describe("App layout mode", () => {
     fireEvent.click(screen.getByRole("button", { name: "Open full layout in new window" }));
     expect(openSpy).toHaveBeenCalledWith(
       expect.stringContaining("layout=full"),
+      "_blank",
+      "noopener,noreferrer"
+    );
+
+    openSpy.mockRestore();
+  });
+
+  it("appends newWindowParams when opening a layout in a new window", () => {
+    const openSpy = vi.spyOn(window, "open").mockReturnValue(null);
+    setSearch("");
+    render(<App newWindowParams={{ theme: "light", source: "demo" }} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Open compact layout in new window" }));
+
+    expect(openSpy).toHaveBeenCalledWith(
+      expect.stringContaining("layout=compact"),
+      "_blank",
+      "noopener,noreferrer"
+    );
+    expect(openSpy).toHaveBeenCalledWith(
+      expect.stringContaining("theme=light"),
+      "_blank",
+      "noopener,noreferrer"
+    );
+    expect(openSpy).toHaveBeenCalledWith(
+      expect.stringContaining("source=demo"),
       "_blank",
       "noopener,noreferrer"
     );

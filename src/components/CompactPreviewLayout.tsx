@@ -3,6 +3,8 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { editor as MonacoEditor } from "monaco-editor";
 import { useCodeEditorStore } from "../context/CodeEditorStore";
 import LivePreview from "./LivePreview";
+import { sharedMonacoEditorOptions } from "./monacoOptions";
+import { loadSandboxStateFromFile, saveSandboxStateToFile } from "../utils/sandboxState";
 import "./CompactPreviewLayout.scss";
 
 type CompactEditorTab = "html" | "css" | "javascript";
@@ -21,13 +23,8 @@ interface CompactPreviewLayoutProps {
 const COMPACT_EDITOR_LINE_HEIGHT = 20;
 
 const editorOptions = {
-  minimap: { enabled: false },
-  automaticLayout: true,
-  fontSize: 16,
+  ...sharedMonacoEditorOptions,
   lineHeight: COMPACT_EDITOR_LINE_HEIGHT,
-  wordWrap: "on" as const,
-  lineNumbers: "on" as const,
-  tabSize: 2,
 };
 
 const DEFAULT_PREVIEW_HEIGHT = 220;
@@ -133,18 +130,12 @@ const CompactPreviewLayout = ({
 
   const handleChange = (value: string | undefined) => {
     const nextValue = value || "";
-
-    if (activeTab === "html") {
-      setHtmlCode(nextValue);
-      return;
-    }
-
-    if (activeTab === "css") {
-      setCssCode(nextValue);
-      return;
-    }
-
-    setJsCode(nextValue);
+    const setCodeByTab = {
+      html: setHtmlCode,
+      css: setCssCode,
+      javascript: setJsCode,
+    };
+    setCodeByTab[activeTab](nextValue);
   };
 
   return (
@@ -168,35 +159,14 @@ const CompactPreviewLayout = ({
           onUpload={(e) => {
             const file = e.target.files?.[0];
             if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (loadEvent) => {
-              try {
-                const content = JSON.parse(loadEvent.target?.result as string);
-                setCssCode(content.css || "");
-                setHtmlCode(content.html || "");
-                setJsCode(content.javascript || "");
-              } catch (err) {
-                console.error("Failed to parse file:", err);
-              }
-            };
-            reader.readAsText(file);
+            loadSandboxStateFromFile(file, { setHtmlCode, setCssCode, setJsCode });
           }}
           onSave={() => {
-            const content = {
+            saveSandboxStateToFile({
               html: htmlCode,
               javascript: jsCode,
               css: cssCode,
-            };
-            const blob = new Blob([JSON.stringify(content, null, 2)], {
-              type: "application/json",
             });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = "sandbox-state.json";
-            link.click();
-            URL.revokeObjectURL(url);
           }}
         />
         <button

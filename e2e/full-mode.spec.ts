@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("full mode interactions", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/?demoStandalone=1");
 
   await expect(page.getByText("HTML")).toBeVisible();
   await expect(page.getByText("JavaScript")).toBeVisible();
