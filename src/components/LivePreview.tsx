@@ -87,7 +87,7 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
       <html>
         <head>
           ${iframeScripts
-            .map((src) => `<script type="module" src="${src}"></script>`)
+            .map((src) => `<script src="${src}"></script>`)
             .join("\n")}
           ${iframeStyles
             .map(

@@ -20,7 +20,6 @@
 .compact-code-drawer {
   display: flex;
   flex-direction: column;
-  min-height: 16rem;
   border-radius: 12px;
   overflow: hidden;
   background: linear-gradient(180deg, rgba(35, 39, 48, 0.88), rgba(24, 27, 33, 0.92));
@@ -68,10 +67,6 @@
   .compact-preview-toggle {
     right: 1.1rem;
     bottom: 1rem;
-  }
-
-  .compact-code-drawer {
-    min-height: 14rem;
   }
 
   .compact-code-drawer-header {

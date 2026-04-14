@@ -1,5 +1,5 @@
 import Editor from "@monaco-editor/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { editor as MonacoEditor } from "monaco-editor";
 import { useCodeEditorStore } from "../context/CodeEditorStore";
 import LivePreview from "./LivePreview";
@@ -18,10 +18,13 @@ interface CompactPreviewLayoutProps {
   iframeStyles?: string[];
 }
 
+const COMPACT_EDITOR_LINE_HEIGHT = 20;
+
 const editorOptions = {
   minimap: { enabled: false },
   automaticLayout: true,
   fontSize: 16,
+  lineHeight: COMPACT_EDITOR_LINE_HEIGHT,
   wordWrap: "on" as const,
   lineNumbers: "on" as const,
   tabSize: 2,
@@ -30,12 +33,29 @@ const editorOptions = {
 const DEFAULT_PREVIEW_HEIGHT = 220;
 const MIN_PREVIEW_HEIGHT = 140;
 const MAX_PREVIEW_HEIGHT = 480;
-const DEFAULT_DRAWER_HEIGHT = 280;
-const MIN_DRAWER_HEIGHT = 220;
-const MAX_DRAWER_HEIGHT = 640;
+const DEFAULT_DRAWER_HEIGHT = 112;
+const MIN_DRAWER_HEIGHT = 112;
+const DRAWER_VERTICAL_PADDING = 12;
 
 const clampHeight = (height: number, minHeight: number, maxHeight: number) => {
   return Math.max(minHeight, Math.min(maxHeight, Math.round(height)));
+};
+
+const clampDrawerHeight = (height: number) => {
+  return Math.max(MIN_DRAWER_HEIGHT, Math.round(height));
+};
+
+const getLineCount = (value: string) => {
+  if (!value) {
+    return 1;
+  }
+
+  return value.split(/\r?\n/).length;
+};
+
+const getDrawerHeightFromCode = (value: string) => {
+  const lineCount = getLineCount(value);
+  return clampDrawerHeight(lineCount * COMPACT_EDITOR_LINE_HEIGHT + DRAWER_VERTICAL_PADDING);
 };
 
 const CompactPreviewLayout = ({
@@ -57,6 +77,7 @@ const CompactPreviewLayout = ({
     setCssCode,
   } = useCodeEditorStore();
   const editorRef = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null);
+  const editorContainerRef = useRef<HTMLDivElement | null>(null);
   const [previewHeight, setPreviewHeight] = useState(DEFAULT_PREVIEW_HEIGHT);
   const [drawerHeight, setDrawerHeight] = useState(DEFAULT_DRAWER_HEIGHT);
 
@@ -64,16 +85,51 @@ const CompactPreviewLayout = ({
   const currentLanguage = activeTab === "html" ? "html" : "javascript";
 
   useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor || !isCodeVisible) {
+    if (!isCodeVisible) {
       return;
     }
 
-    setDrawerHeight(
-      clampHeight(editor.getContentHeight() + 20, MIN_DRAWER_HEIGHT, MAX_DRAWER_HEIGHT)
-    );
-    editor.layout();
+    const nextHeight = getDrawerHeightFromCode(currentValue);
+    setDrawerHeight((currentHeight) => (currentHeight === nextHeight ? currentHeight : nextHeight));
   }, [activeTab, currentValue, isCodeVisible]);
+
+  const relayoutEditor = () => {
+    if (!editorRef.current || !editorContainerRef.current) {
+      return;
+    }
+
+    const width = editorContainerRef.current.clientWidth;
+    const height = editorContainerRef.current.clientHeight;
+
+    if (width > 0 && height > 0) {
+      editorRef.current.layout({ width, height });
+      return;
+    }
+
+    editorRef.current.layout();
+  };
+
+  useLayoutEffect(() => {
+    if (!isCodeVisible) {
+      return;
+    }
+
+    let secondFrame: number | null = null;
+    const firstFrame = requestAnimationFrame(() => {
+      relayoutEditor();
+      secondFrame = requestAnimationFrame(() => {
+        relayoutEditor();
+      });
+    });
+
+    return () => {
+      cancelAnimationFrame(firstFrame);
+
+      if (secondFrame !== null) {
+        cancelAnimationFrame(secondFrame);
+      }
+    };
+  }, [activeTab, drawerHeight, isCodeVisible]);
 
   const handleChange = (value: string | undefined) => {
     const nextValue = value || "";
@@ -153,7 +209,6 @@ const CompactPreviewLayout = ({
         <div
           className="compact-code-drawer"
           id="compact-code-drawer"
-          style={{ height: `${drawerHeight}px` }}
         >
           <div className="compact-code-drawer-header">
             <span className="compact-code-drawer-title">Code</span>
@@ -178,9 +233,13 @@ const CompactPreviewLayout = ({
               </button>
             </div>
           </div>
-          <div className="compact-code-drawer-editor">
+          <div
+            ref={editorContainerRef}
+            className="compact-code-drawer-editor"
+            style={{ height: `${drawerHeight}px` }}
+          >
             <Editor
-              height={`${drawerHeight - 41}px`}
+              height={`${drawerHeight}px`}
               defaultLanguage={currentLanguage}
               language={currentLanguage}
               loading={null}
@@ -190,13 +249,8 @@ const CompactPreviewLayout = ({
               options={editorOptions}
               onMount={(editor) => {
                 editorRef.current = editor;
-                setDrawerHeight(
-                  clampHeight(editor.getContentHeight() + 20, MIN_DRAWER_HEIGHT, MAX_DRAWER_HEIGHT)
-                );
-                editor.onDidContentSizeChange(() => {
-                  setDrawerHeight(
-                    clampHeight(editor.getContentHeight() + 20, MIN_DRAWER_HEIGHT, MAX_DRAWER_HEIGHT)
-                  );
+                requestAnimationFrame(() => {
+                  relayoutEditor();
                 });
               }}
             />

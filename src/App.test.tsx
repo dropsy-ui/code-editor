@@ -83,4 +83,27 @@ describe("App layout mode", () => {
     await user.click(jsTab);
     expect(jsTab).toHaveAttribute("aria-selected", "true");
   });
+
+  it("honors layoutModeOverride over URL query mode", () => {
+    setSearch("?layout=compact");
+    render(<App layoutModeOverride="full" />);
+
+    expect(screen.getByText("HTML")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Show code" })).toBeNull();
+  });
+
+  it("accepts initial code props and renders seeded content", async () => {
+    setSearch("");
+    render(
+      <App
+        initialHtmlCode="<h1>Seeded HTML</h1>"
+        initialCssCode="body { color: hotpink; }"
+        initialJsCode="console.log('seeded')"
+      />
+    );
+
+    expect(screen.getByDisplayValue("<h1>Seeded HTML</h1>")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("body { color: hotpink; }")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("console.log('seeded')")).toBeInTheDocument();
+  });
 });

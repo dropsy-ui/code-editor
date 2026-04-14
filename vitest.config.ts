@@ -15,6 +15,7 @@ export default defineConfig({
       exclude: [
         "src/main.tsx",
         "src/embed.tsx",
+        "src/demo/**",
         "src/vite-env.d.ts",
         "src/test/**",
         "src/context/ConsoleStoreContext.tsx",

@@ -11,6 +11,11 @@ import "./splitter.scss";
 interface AppProps {
   iframeScripts?: string[];
   iframeStyles?: string[];
+  layoutModeOverride?: LayoutMode;
+  initialHtmlCode?: string;
+  initialCssCode?: string;
+  initialJsCode?: string;
+  newWindowParams?: Record<string, string>;
 }
 
 type LayoutMode = "full" | "compact";
@@ -26,9 +31,14 @@ const getInitialLayoutMode = (): LayoutMode => {
   return mode === "compact" ? "compact" : "full";
 };
 
-function AppInner({ iframeScripts = [], iframeStyles = [] }: AppProps) {
+function AppInner({
+  iframeScripts = [],
+  iframeStyles = [],
+  layoutModeOverride,
+  newWindowParams,
+}: AppProps) {
   const [expanded, setExpanded] = useState({ html: true, js: true, css: true });
-  const [layoutMode] = useState<LayoutMode>(getInitialLayoutMode);
+  const [urlLayoutMode] = useState<LayoutMode>(getInitialLayoutMode);
   const [isCompactCodeVisible, setIsCompactCodeVisible] = useState(false);
   const [compactEditorTab, setCompactEditorTab] = useState<CompactEditorTab>("html");
   const {
@@ -38,11 +48,17 @@ function AppInner({ iframeScripts = [], iframeStyles = [] }: AppProps) {
     onSplitterMouseDown,
   } = useSplitter(50);
 
+  const layoutMode = layoutModeOverride ?? urlLayoutMode;
   const isCompactMode = layoutMode === "compact";
 
   const openLayoutInNewWindow = (mode: LayoutMode) => {
     const url = new URL(window.location.href);
     url.searchParams.set("layout", mode);
+    if (newWindowParams) {
+      Object.entries(newWindowParams).forEach(([key, value]) => {
+        url.searchParams.set(key, value);
+      });
+    }
     window.open(url.toString(), "_blank", "noopener,noreferrer");
   };
 
@@ -101,8 +117,18 @@ function AppInner({ iframeScripts = [], iframeStyles = [] }: AppProps) {
 }
 
 function App(props: AppProps) {
+  const {
+    initialHtmlCode,
+    initialCssCode,
+    initialJsCode,
+  } = props;
+
   return (
-    <CodeEditorStoreProvider>
+    <CodeEditorStoreProvider
+      initialHtmlCode={initialHtmlCode}
+      initialCssCode={initialCssCode}
+      initialJsCode={initialJsCode}
+    >
       <AppInner {...props} />
     </CodeEditorStoreProvider>
   );

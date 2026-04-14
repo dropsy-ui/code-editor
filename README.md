@@ -9,6 +9,19 @@ A React-based embeddable code editor with live HTML/CSS/JS preview.
 - Embeddable as a standalone widget
 - JSON import/export of editor state
 
+## Demo (Dev Only)
+
+The local dev entrypoint (`src/main.tsx`) now renders a demo gallery (`src/demo/DemoApp.tsx`) that is **compact-first**:
+
+- All examples start in compact mode.
+- Each example has its own toggle to switch between compact and full mode.
+- Examples include third-party iframe injection presets (Bootstrap and Tailwind).
+
+This demo shell is **not** the distributed library entry.
+
+- Distributed embed entry: `src/embed.tsx`
+- Library build entry: `build.lib.entry` in `vite.config.ts`
+
 ## Installation
 
 ```sh
@@ -37,6 +50,24 @@ Add the following to your HTML:
   const editor = new CodeEditor('#editor-container', {
     scripts, // Array of JS URLs for the preview iframe
     styles   // Array of CSS URLs for the preview iframe
+  });
+</script>
+```
+
+### Third-Party Library Injection
+
+You can pass external URLs through `scripts` and `styles` to load libraries inside the preview iframe.
+
+```html
+<script>
+  const editor = new CodeEditor('#editor-container', {
+    scripts: [
+      'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js',
+      'https://cdn.tailwindcss.com'
+    ],
+    styles: [
+      'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css'
+    ]
   });
 </script>
 ```

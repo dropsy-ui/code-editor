@@ -33,6 +33,22 @@ function StoreHarness() {
 }
 
 describe("CodeEditorStoreContext", () => {
+  it("supports initial code props", () => {
+    render(
+      <CodeEditorStoreProvider
+        initialHtmlCode="<p>seed html</p>"
+        initialCssCode="p { color: teal; }"
+        initialJsCode="console.log('seed')"
+      >
+        <StoreHarness />
+      </CodeEditorStoreProvider>
+    );
+
+    expect(screen.getByTestId("html")).toHaveTextContent("<p>seed html</p>");
+    expect(screen.getByTestId("css")).toHaveTextContent("p { color: teal; }");
+    expect(screen.getByTestId("js")).toHaveTextContent("console.log('seed')");
+  });
+
   it("initializes and updates all code fields", async () => {
     const user = userEvent.setup();
 
