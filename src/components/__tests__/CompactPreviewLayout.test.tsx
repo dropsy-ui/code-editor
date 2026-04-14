@@ -38,6 +38,9 @@ describe("CompactPreviewLayout", () => {
     await user.click(screen.getByRole("tab", { name: "JavaScript" }));
 
     expect(onTabChange).toHaveBeenCalledWith("javascript");
+
+    await user.click(screen.getByRole("tab", { name: "CSS" }));
+    expect(onTabChange).toHaveBeenCalledWith("css");
   });
 
   it("handles invalid JSON upload gracefully", async () => {
@@ -89,6 +92,18 @@ describe("CompactPreviewLayout", () => {
     await user.type(editor, "<main>hello</main>");
 
     expect((editor as HTMLTextAreaElement).value).toContain("<main>hello</main>");
+  });
+
+  it("handleChange updates css code when activeTab is css", async () => {
+    const user = userEvent.setup();
+
+    renderLayout({ activeTab: "css" });
+
+    const editor = screen.getByTestId("mock-monaco-editor");
+    await user.clear(editor);
+    await user.type(editor, "main color red;");
+
+    expect((editor as HTMLTextAreaElement).value).toContain("main color red;");
   });
 
   it("handleChange falls back to empty string when editor emits undefined", async () => {

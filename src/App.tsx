@@ -19,7 +19,7 @@ interface AppProps {
 }
 
 type LayoutMode = "full" | "compact";
-type CompactEditorTab = "html" | "javascript";
+type CompactEditorTab = "html" | "css" | "javascript";
 
 const getInitialLayoutMode = (): LayoutMode => {
   /* v8 ignore next 3 */

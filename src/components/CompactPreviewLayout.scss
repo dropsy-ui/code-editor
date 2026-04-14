@@ -4,10 +4,27 @@
   gap: 0.75rem;
 }
 
+.compact-layout.compact-layout--docked {
+  gap: 0;
+}
+
 .compact-preview-shell {
   position: relative;
   flex: 0 0 auto;
   padding-bottom: 0.2rem;
+}
+
+.compact-preview-shell .live-preview-outer {
+  border-radius: 12px;
+}
+
+.compact-layout.compact-layout--docked .compact-preview-shell {
+  padding-bottom: 0;
+}
+
+.compact-layout.compact-layout--docked .live-preview-outer {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .compact-preview-toggle {
@@ -25,6 +42,12 @@
   background: linear-gradient(180deg, rgba(35, 39, 48, 0.88), rgba(24, 27, 33, 0.92));
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
   border: 1px solid var(--app-border-subtle-color);
+}
+
+.compact-layout.compact-layout--docked .compact-code-drawer {
+  margin-top: -1px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
 
 .compact-code-drawer-header {

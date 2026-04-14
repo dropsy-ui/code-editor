@@ -5,7 +5,7 @@ import { useCodeEditorStore } from "../context/CodeEditorStore";
 import LivePreview from "./LivePreview";
 import "./CompactPreviewLayout.scss";
 
-type CompactEditorTab = "html" | "javascript";
+type CompactEditorTab = "html" | "css" | "javascript";
 
 interface CompactPreviewLayoutProps {
   isCodeVisible: boolean;
@@ -81,8 +81,8 @@ const CompactPreviewLayout = ({
   const [previewHeight, setPreviewHeight] = useState(DEFAULT_PREVIEW_HEIGHT);
   const [drawerHeight, setDrawerHeight] = useState(DEFAULT_DRAWER_HEIGHT);
 
-  const currentValue = activeTab === "html" ? htmlCode : jsCode;
-  const currentLanguage = activeTab === "html" ? "html" : "javascript";
+  const currentValue = activeTab === "html" ? htmlCode : activeTab === "css" ? cssCode : jsCode;
+  const currentLanguage = activeTab === "html" ? "html" : activeTab === "css" ? "css" : "javascript";
 
   useEffect(() => {
     if (!isCodeVisible) {
@@ -139,11 +139,16 @@ const CompactPreviewLayout = ({
       return;
     }
 
+    if (activeTab === "css") {
+      setCssCode(nextValue);
+      return;
+    }
+
     setJsCode(nextValue);
   };
 
   return (
-    <div className="compact-layout">
+    <div className={`compact-layout${isCodeVisible ? " compact-layout--docked" : ""}`}>
       <div className="compact-preview-shell">
         <LivePreview
           htmlCode={htmlCode}
@@ -230,6 +235,15 @@ const CompactPreviewLayout = ({
                 aria-selected={activeTab === "javascript"}
               >
                 JavaScript
+              </button>
+              <button
+                type="button"
+                className={`app-btn app-btn--text compact-code-tab${activeTab === "css" ? " is-active" : ""}`}
+                onClick={() => onTabChange("css")}
+                role="tab"
+                aria-selected={activeTab === "css"}
+              >
+                CSS
               </button>
             </div>
           </div>
