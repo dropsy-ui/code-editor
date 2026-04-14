@@ -1,32 +1,31 @@
 .console-container {
-  background: var(--app-surface-muted-color);
-  color: var(--app-text-color);
+  background: var(--code-editor-color-surface-muted);
+  color: var(--code-editor-color-text);
   height: 100%;
   display: flex;
   flex-direction: column;
   min-height: 0;
-  border: 1px solid var(--app-border-subtle-color);
+  border: var(--code-editor-border-width) solid var(--code-editor-color-border-subtle);
   border-radius: inherit;
   overflow: hidden;
 }
 
 .console-logs {
-  font-family: ui-monospace, SFMono-Regular, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-family: var(--code-editor-font-family-mono);
   padding: 0.6rem 0.75rem 0.85rem;
   overflow: auto;
   flex: 1;
-  background:
-    linear-gradient(180deg, rgba(30, 30, 30, 0.98), rgba(20, 20, 20, 0.98));
+  background: var(--code-editor-gradient-console);
 }
 
 .console-log {
   padding: 0.45rem 0.55rem;
-  border-radius: 0.65rem;
-  color: #d1d5db;
-  font-size: 0.83rem;
+  border-radius: var(--code-editor-radius-sm);
+  color: var(--code-editor-color-console-text);
+  font-size: var(--code-editor-font-size-console);
   line-height: 1.45;
-  border: 1px solid rgba(58, 64, 76, 0.55);
-  background: rgba(24, 27, 33, 0.9);
+  border: var(--code-editor-border-width) solid var(--code-editor-color-console-log-border);
+  background: var(--code-editor-color-console-log-bg);
 }
 
 .console-log + .console-log {
@@ -34,7 +33,7 @@
 }
 
 .console-log--error {
-  color: #fecaca;
-  border-color: rgba(248, 113, 113, 0.34);
-  background: rgba(69, 20, 27, 0.62);
+  color: var(--code-editor-color-console-error-text);
+  border-color: var(--code-editor-color-console-error-border);
+  background: var(--code-editor-color-console-error-bg);
 }

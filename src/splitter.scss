@@ -1,7 +1,7 @@
 // SCSS for splitter and layout
 .app-body {
   height: 100%;
-  background: var(--app-bg-color);
+  background: var(--code-editor-color-bg);
 
   .app-main {
     height: 100%;
@@ -33,14 +33,14 @@
           content: "";
           position: absolute;
           inset: 0.35rem 0.25rem;
-          border-radius: 999px;
-          background: linear-gradient(180deg, rgba(90, 98, 114, 0.95), rgba(58, 64, 76, 0.95));
+          border-radius: var(--code-editor-radius-full);
+          background: var(--code-editor-gradient-splitter);
           transition: background 0.2s ease, box-shadow 0.2s ease;
         }
 
         &:hover::before {
-          background: linear-gradient(180deg, rgba(125, 211, 252, 0.85), rgba(59, 130, 246, 0.85));
-          box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.16);
+          background: var(--code-editor-gradient-splitter-hover);
+          box-shadow: var(--code-editor-shadow-splitter-focus);
         }
       }
 
@@ -57,7 +57,7 @@
 
         .console-section {
           min-height: 0;
-          background: var(--app-bg-color);
+          background: var(--code-editor-color-bg);
         }
       }
     }
