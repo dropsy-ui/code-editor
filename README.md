@@ -15,36 +15,86 @@ A React-based embeddable code editor with live HTML/CSS/JS preview.
 npm install @dropsy-ui/code-editor
 ```
 
-This will generate `dist/code-editor.umd.js`.
-
 ## Usage
 
-Add the following to your HTML:
+Use the UMD bundle in a browser page:
 
 ```html
 <div id="editor-container"></div>
 <script src="node_modules/@dropsy-ui/code-editor/dist/code-editor.umd.js"></script>
 <script>
-  // Provide scripts and styles for the preview iframe
-  const scripts = [
-    // Example: "https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"
-  ];
-  const styles = [
-    // Example: "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-  ];
+  const scripts = [];
+  const styles = [];
 
-  // Initialize the embedded editor
   const editor = new CodeEditor('#editor-container', {
-    scripts, // Array of JS URLs for the preview iframe
-    styles   // Array of CSS URLs for the preview iframe
+    scripts,
+    styles
   });
 </script>
 ```
 
-### 3. Editor State Import/Export
+### Third-Party Injection
 
-- **Export:** Click the Save button to download the current state as a JSON file.
-- **Import:** Click the Upload button and select a previously saved JSON file to restore the editor state.
+You can pass external URLs through `scripts` and `styles` to load libraries inside the preview iframe.
+
+```html
+<script>
+  const editor = new CodeEditor('#editor-container', {
+    scripts: [
+      'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js',
+      'https://cdn.tailwindcss.com'
+    ],
+    styles: [
+      'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css'
+    ]
+  });
+</script>
+```
+
+### Editor State Import/Export
+
+- Export: Click Save to download the current editor state as JSON.
+- Import: Click Upload and select a previously saved JSON file.
+
+## Theming
+
+CodeEditor exposes consumer-facing CSS custom properties prefixed with `--code-editor-`.
+Override them in your app's `:root` (or a container selector) to theme the editor.
+
+```css
+:root {
+  --code-editor-color-bg: #101317;
+  --code-editor-color-surface-muted: #161b24;
+  --code-editor-color-text: #e5e7eb;
+  --code-editor-radius-lg: 1rem;
+  --code-editor-font-family-base: "IBM Plex Sans", sans-serif;
+  --code-editor-font-size-title: 0.8rem;
+  --code-editor-shadow-panel: 0 10px 28px rgba(0, 0, 0, 0.24);
+}
+```
+
+Token groups currently supported:
+
+- Colors: surfaces, text, focus, preview background, editor background, button/console states
+- Gradients: panel, header, button, active tabs, splitter, console, preview stage
+- Radii: xs, sm, md, lg, full
+- Typography: base/mono families, font scale, weights, semantic aliases (title, label, button)
+- Shadows: panel, elevated panel, inset, header, focus ring, splitter focus
+- Spacing: 2xs through xl
+- Border widths: shared border width token
+- Scrollbar: size, track, thumb, hover, radius
+
+Notes:
+
+- This applies to library styles in `src/App.scss`, `src/components/*.scss`, and `src/splitter.scss`.
+- Demo-only styles in `src/demo/**` are excluded.
+- Motion/easing tokens are not included in this pass.
+
+## Development Demo
+
+In development, `src/main.tsx` renders `src/demo/DemoApp.tsx` (compact-first examples).
+
+Distributed library entrypoint: `src/embed.tsx`.
 
 ---
 

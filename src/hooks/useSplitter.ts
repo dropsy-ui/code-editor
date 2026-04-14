@@ -7,6 +7,7 @@ export function useSplitter(initialPercent: number = 50) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const onMouseMove = useCallback((e: MouseEvent) => {
+    /* v8 ignore next */
     if (!isDraggingRef.current) return;
     const container = containerRef.current;
     if (!container) return;

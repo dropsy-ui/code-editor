@@ -1,0 +1,105 @@
+.compact-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--code-editor-spacing-lg);
+}
+
+.compact-layout.compact-layout--docked {
+  gap: 0;
+}
+
+.compact-preview-shell {
+  position: relative;
+  flex: 0 0 auto;
+  padding-bottom: 0.2rem;
+}
+
+.compact-preview-shell .live-preview-outer {
+  border-radius: var(--code-editor-radius-lg);
+}
+
+.compact-layout.compact-layout--docked .compact-preview-shell {
+  padding-bottom: 0;
+}
+
+.compact-layout.compact-layout--docked .live-preview-outer {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.compact-preview-toggle {
+  position: absolute;
+  right: 1.55rem;
+  bottom: 1.35rem;
+  z-index: 2;
+}
+
+.compact-code-drawer {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--code-editor-radius-lg);
+  overflow: hidden;
+  background: var(--code-editor-gradient-panel);
+  box-shadow: var(--code-editor-shadow-panel);
+  border: var(--code-editor-border-width) solid var(--code-editor-color-border-subtle);
+}
+
+.compact-layout.compact-layout--docked .compact-code-drawer {
+  margin-top: -1px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.compact-code-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 2.5rem;
+  padding: var(--code-editor-spacing-md) var(--code-editor-spacing-xl);
+  border-bottom: var(--code-editor-border-width) solid var(--code-editor-color-border);
+  background: var(--code-editor-gradient-header);
+  box-shadow: var(--code-editor-shadow-header);
+}
+
+.compact-code-drawer-title {
+  font-size: var(--code-editor-font-size-title);
+  font-weight: var(--code-editor-font-weight-title);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--code-editor-color-text);
+}
+
+.compact-code-drawer-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.compact-code-tab.is-active {
+  border-color: rgba(96, 165, 250, 0.42);
+  background: var(--code-editor-gradient-active-tab);
+}
+
+.compact-code-drawer-editor {
+  flex: 1;
+  min-height: 0;
+  background: var(--code-editor-color-editor-bg);
+}
+
+@media (max-width: 720px) {
+  .compact-preview-toggle {
+    right: 1.1rem;
+    bottom: 1rem;
+  }
+
+  .compact-code-drawer-header {
+    gap: 0.75rem;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .compact-code-drawer-tabs {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

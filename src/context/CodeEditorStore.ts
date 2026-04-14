@@ -16,6 +16,7 @@ export const CodeEditorStoreContext = createContext<CodeEditorStore | undefined>
 
 export function useCodeEditorStore() {
   const ctx = useContext(CodeEditorStoreContext);
+  /* v8 ignore next */
   if (!ctx) throw new Error('useCodeEditorStore must be used within a CodeEditorStoreProvider');
   return ctx;
 }

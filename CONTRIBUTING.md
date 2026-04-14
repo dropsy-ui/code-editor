@@ -1,8 +1,23 @@
 # Contributing to CodeEditor
 
-## Development
+## Development Commands
 
-### Start the Dev Server
+- `npm run dev` - start local development server
+- `npm run build` - build the library bundle
+- `npm run lint` - run ESLint
+- `npm run test` - run unit tests (Vitest)
+- `npm run test:e2e` - run end-to-end tests (Playwright)
+- `npm run preview` - preview production build locally
+
+## Local Development
+
+1. Install dependencies:
+
+```sh
+npm install
+```
+
+2. Start the dev server:
 
 ```sh
 npm run dev
@@ -10,35 +25,23 @@ npm run dev
 
 Open [http://localhost:5173](http://localhost:5173) to view the app in development mode.
 
-### Build
+3. Validate changes before opening a PR:
 
 ```sh
 npm run build
-```
-
-### Lint
-
-```sh
 npm run lint
+npm run test
 ```
 
-### Preview Production Build
+## Project Notes
 
-```sh
-npm run preview
-```
-
-## ESLint Configuration
-
-- The project uses ESLint with recommended React and TypeScript rules.
-- See `eslint.config.js` for configuration details.
-
-## Adding or Modifying Features
-
-- All global or shared SCSS should be imported in `src/embed.tsx` to ensure styles are included in the bundle.
-- To add new features, create or update components in `src/components/`.
+- Shared/library SCSS should be imported through `src/embed.tsx` so styles are included in the distributed bundle.
+- Build output is configured in `vite.config.ts`.
 
 ## Pull Requests
 
-- Please ensure all code passes linting and builds successfully before submitting a PR.
-- Add or update documentation as needed.
+- Use Conventional Commit messages (for automated releases).
+- Keep changes focused and include tests when behavior changes.
+- Update docs when APIs, behavior, or developer workflow change.
+- Ensure build, lint, and tests pass before requesting review.
+

@@ -1,11 +1,79 @@
 :root {
-  --app-bg-color: #272f52;
-  --app-btn-bg-color: #2563eb;
-  --app-btn-hover-bg-color: #1d4ed8;
-  --app-border-color: #444c5e;
-  --app-preview-bg-color: #fff;
-  --app-text-color: #fff;
-  --editor-bg-color: #1e1e1e;
+  --code-editor-color-bg: #131417;
+  --code-editor-color-surface-muted: #181b21;
+  --code-editor-color-border: #3a404c;
+  --code-editor-color-border-subtle: #282d36;
+  --code-editor-color-text: #f3f4f6;
+  --code-editor-color-preview-bg: #f8fafc;
+  --code-editor-color-focus: #60a5fa;
+  --code-editor-color-editor-bg: #1e1e1e;
+  --code-editor-color-button-hover: #353d4b;
+  --code-editor-color-button-active: #40495a;
+  --code-editor-color-button-hover-border: #505868;
+
+  --code-editor-gradient-panel: linear-gradient(180deg, rgba(35, 39, 48, 0.88), rgba(24, 27, 33, 0.92));
+  --code-editor-gradient-header: linear-gradient(180deg, rgba(43, 49, 61, 0.98), rgba(31, 34, 41, 0.98));
+  --code-editor-gradient-button: linear-gradient(180deg, rgba(53, 61, 75, 0.9), rgba(43, 49, 61, 0.9));
+  --code-editor-gradient-active-tab: linear-gradient(180deg, rgba(72, 93, 125, 0.96), rgba(50, 68, 96, 0.96));
+  --code-editor-gradient-splitter: linear-gradient(180deg, rgba(90, 98, 114, 0.95), rgba(58, 64, 76, 0.95));
+  --code-editor-gradient-splitter-hover: linear-gradient(180deg, rgba(125, 211, 252, 0.85), rgba(59, 130, 246, 0.85));
+  --code-editor-gradient-console: linear-gradient(180deg, rgba(30, 30, 30, 0.98), rgba(20, 20, 20, 0.98));
+  --code-editor-gradient-preview-stage: linear-gradient(180deg, rgba(31, 34, 41, 0.98), rgba(24, 27, 33, 0.98));
+
+  --code-editor-radius-xs: 0.55rem;
+  --code-editor-radius-sm: 0.65rem;
+  --code-editor-radius-md: 0.9rem;
+  --code-editor-radius-lg: 0.75rem;
+  --code-editor-radius-full: 999px;
+
+  --code-editor-font-family-base: "InterVariable", sans-serif;
+  --code-editor-font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --code-editor-font-size-xs: 0.72rem;
+  --code-editor-font-size-sm: 0.74rem;
+  --code-editor-font-size-base: 0.78rem;
+  --code-editor-font-size-console: 0.83rem;
+  --code-editor-font-size-lg: 1rem;
+  --code-editor-font-weight-regular: 400;
+  --code-editor-font-weight-medium: 500;
+  --code-editor-font-weight-semibold: 600;
+  --code-editor-font-weight-bold: 700;
+
+  --code-editor-font-size-title: var(--code-editor-font-size-sm);
+  --code-editor-font-size-label: var(--code-editor-font-size-base);
+  --code-editor-font-size-button: var(--code-editor-font-size-xs);
+  --code-editor-font-weight-title: var(--code-editor-font-weight-bold);
+  --code-editor-font-weight-label: var(--code-editor-font-weight-semibold);
+  --code-editor-font-weight-button: var(--code-editor-font-weight-bold);
+
+  --code-editor-shadow-panel: 0 12px 24px rgba(0, 0, 0, 0.18);
+  --code-editor-shadow-panel-elevated: 0 14px 30px rgba(0, 0, 0, 0.18);
+  --code-editor-shadow-inset-soft: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --code-editor-shadow-inset-subtle: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  --code-editor-shadow-header: inset 0 -1px 0 rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --code-editor-shadow-focus-ring: 0 0 0 3px rgba(96, 165, 250, 0.2);
+  --code-editor-shadow-splitter-focus: 0 0 0 3px rgba(96, 165, 250, 0.16);
+
+  --code-editor-spacing-2xs: 0.25rem;
+  --code-editor-spacing-xs: 0.4rem;
+  --code-editor-spacing-sm: 0.5rem;
+  --code-editor-spacing-md: 0.55rem;
+  --code-editor-spacing-lg: 0.75rem;
+  --code-editor-spacing-xl: 0.9rem;
+
+  --code-editor-border-width: 1px;
+
+  --code-editor-color-console-text: #d1d5db;
+  --code-editor-color-console-log-bg: rgba(24, 27, 33, 0.9);
+  --code-editor-color-console-log-border: rgba(58, 64, 76, 0.55);
+  --code-editor-color-console-error-text: #fecaca;
+  --code-editor-color-console-error-bg: rgba(69, 20, 27, 0.62);
+  --code-editor-color-console-error-border: rgba(248, 113, 113, 0.34);
+
+  --code-editor-scrollbar-size: 0.65rem;
+  --code-editor-scrollbar-track-bg: rgba(255, 255, 255, 0.04);
+  --code-editor-scrollbar-thumb-bg: rgba(156, 163, 175, 0.35);
+  --code-editor-scrollbar-thumb-hover-bg: rgba(156, 163, 175, 0.55);
+  --code-editor-scrollbar-radius: var(--code-editor-radius-full);
 }
 
 html,
@@ -25,7 +93,13 @@ body,
 }
 
 body {
-  font-family: "InterVariable", sans-serif;
+  font-family: var(--code-editor-font-family-base);
+  background:
+    radial-gradient(circle at top, rgba(96, 165, 250, 0.08), transparent 28%),
+    var(--code-editor-color-bg);
+  color: var(--code-editor-color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .console-section {
@@ -36,10 +110,18 @@ body {
   height: 100%;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  background: var(--code-editor-color-surface-muted);
+  border: var(--code-editor-border-width) solid var(--code-editor-color-border-subtle);
+  border-radius: inherit;
+  overflow: hidden;
+  box-shadow: var(--code-editor-shadow-inset-subtle);
 }
 
 .editor-content {
   flex: 1;
+  min-height: 0;
+  background: var(--code-editor-color-editor-bg);
 }
 
 .file-input-hidden {
@@ -49,81 +131,168 @@ body {
 .app-body {
   display: flex;
   height: 100%;
-  background: var(--app-bg-color);
+  padding: var(--code-editor-spacing-2xs);
+}
+
+.app-body--compact {
+  height: auto;
+  min-height: 0;
+  align-items: flex-start;
+  overflow: auto;
+}
+
+.app-drag-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  cursor: col-resize;
+  background: transparent;
 }
 
 .app-main {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.app-main--compact {
+  align-self: flex-start;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
 }
 
 .app-editors-row {
   display: flex;
   flex: 1;
+  min-height: 0;
+  padding: var(--code-editor-spacing-2xs);
+  gap: var(--code-editor-spacing-lg);
+}
+
+.app-compact-main {
+  flex: 0 0 auto;
+  padding: var(--code-editor-spacing-2xs);
+  overflow: auto;
 }
 
 .app-editors-col {
-  width: 50%;
   display: flex;
   flex-direction: column;
-  /* Add right border as separator */
-  border-right: 1.5px solid var(--app-border-color);
-  box-sizing: border-box;
+  min-height: 0;
+  gap: var(--code-editor-spacing-lg);
 }
 
 .preview-section {
-  width: 50%;
   display: flex;
   flex-direction: column;
-  font-size: 1rem;
-  font-weight: 500;
-  /* Remove left border if present, handled by .app-editors-col */
-  border-left: none;
+  min-width: 0;
+  min-height: 0;
+  gap: var(--code-editor-spacing-lg);
+  font-size: var(--code-editor-font-size-lg);
+  font-weight: var(--code-editor-font-weight-medium);
 }
 
 .editor-section {
-  height: 33.3333%;
-}
-
-.preview-section {
-  width: 50%;
-  display: flex;
-  flex-direction: column;
-  font-size: 1rem;
-  font-weight: 500;
+  min-height: 0;
+  border-radius: var(--code-editor-radius-lg);
+  overflow: hidden;
+  background: var(--code-editor-gradient-panel);
+  box-shadow: var(--code-editor-shadow-panel);
 }
 
 .live-preview-flex {
   flex: 1 1 auto;
   min-height: 0;
+  border-radius: var(--code-editor-radius-lg);
+  overflow: hidden;
+  background: var(--code-editor-gradient-panel);
+  box-shadow: var(--code-editor-shadow-panel);
 }
 
 .console-section {
   height: 12rem;
   min-height: 4rem;
   max-height: 50vh;
-  overflow: auto;
+  overflow: hidden;
+  border-radius: var(--code-editor-radius-lg);
+  background: var(--code-editor-gradient-panel);
+  box-shadow: var(--code-editor-shadow-panel);
 }
 
 .app-btn {
-  padding: 0.5rem 0.5rem;
-  background-color: var(--app-btn-bg-color);
-  border-radius: 0.25rem;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  background: var(--code-editor-gradient-button);
+  border-radius: var(--code-editor-radius-xs);
   display: flex;
   align-items: center;
-  transition: background 0.2s;
-  border: none;
-  font-size: 1rem;
-  font-weight: 500;
+  justify-content: center;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  border: var(--code-editor-border-width) solid var(--code-editor-color-border);
+  font-size: var(--code-editor-font-size-lg);
+  font-weight: var(--code-editor-font-weight-medium);
   cursor: pointer;
+  box-shadow: var(--code-editor-shadow-inset-soft);
 
   img {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 1rem;
+    height: 1rem;
+    filter: brightness(0) invert(1);
+    opacity: 0.88;
   }
 }
 
+.app-btn--text {
+  width: auto;
+  min-width: 2rem;
+  padding: 0 0.85rem;
+  color: var(--code-editor-color-text);
+  font-size: var(--code-editor-font-size-button);
+  font-weight: var(--code-editor-font-weight-button);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
 .app-btn:hover {
-  background-color: var(--app-btn-hover-bg-color);
+  background-color: var(--code-editor-color-button-hover);
+  border-color: var(--code-editor-color-button-hover-border);
+  transform: translateY(-1px);
+}
+
+.app-btn:active {
+  background-color: var(--code-editor-color-button-active);
+  transform: translateY(0);
+}
+
+.app-btn:focus-visible {
+  outline: none;
+  border-color: var(--code-editor-color-focus);
+  box-shadow: var(--code-editor-shadow-focus-ring);
+}
+
+::-webkit-scrollbar {
+  width: var(--code-editor-scrollbar-size);
+  height: var(--code-editor-scrollbar-size);
+}
+
+::-webkit-scrollbar-track {
+  background: var(--code-editor-scrollbar-track-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--code-editor-scrollbar-thumb-bg);
+  border-radius: var(--code-editor-scrollbar-radius);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--code-editor-scrollbar-thumb-hover-bg);
 }

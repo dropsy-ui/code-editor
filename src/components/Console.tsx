@@ -11,7 +11,9 @@ const Console = () => {
       <EditorHeader title="Console" onClear={clearLogs} />
       <div className="console-logs">
         {logs.map((log, i) => (
-          <div key={i}>{`> ${log.level === 'error' ? 'Error: ' : ''}${log.message}`}</div>
+          <div key={i} className={`console-log console-log--${log.level}`}>
+            {`> ${log.level === 'error' ? 'Error: ' : ''}${log.message}`}
+          </div>
         ))}
       </div>
     </div>

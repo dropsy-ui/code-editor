@@ -1,19 +1,40 @@
 .editor-header {
-  background-color: var(--app-bg-color);
-  color: var(--app-text-color);
-  padding: 0.5rem 1rem;
+  background: var(--code-editor-gradient-header);
+  color: var(--code-editor-color-text);
+  padding: var(--code-editor-spacing-md) var(--code-editor-spacing-xl);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.875rem;
-  font-weight: 400;
+  gap: var(--code-editor-spacing-lg);
+  font-size: var(--code-editor-font-size-label);
+  font-weight: var(--code-editor-font-weight-label);
   min-height: 2.5rem;
   height: 2.5rem;
-  border-bottom: 1px solid var(--app-border-color);
+  border-bottom: var(--code-editor-border-width) solid var(--code-editor-color-border);
+  box-shadow: var(--code-editor-shadow-header);
+
+  .editor-header-title-group {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .editor-header-title {
+    font-size: var(--code-editor-font-size-title);
+    font-weight: var(--code-editor-font-weight-title);
+    line-height: 1;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--code-editor-color-text);
+  }
 
   .editor-header-actions {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--code-editor-spacing-sm);
+  }
+
+  .editor-header-btn {
+    flex: 0 0 auto;
   }
 }

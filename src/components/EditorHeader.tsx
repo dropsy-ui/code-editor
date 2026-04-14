@@ -6,19 +6,21 @@ import './EditorHeader.scss';
 interface EditorHeaderProps {
   title: string;
   onClear: () => void;
-  onCollapse?: () => void; // Optional collapse handler
+  onToggle?: () => void; // Optional collapse/expand handler
   isCollapsed?: boolean;   // Optional collapsed state
 }
 
-export function EditorHeader({ title, onClear, onCollapse, isCollapsed }: EditorHeaderProps) {
+export function EditorHeader({ title, onClear, onToggle, isCollapsed }: EditorHeaderProps) {
   return (
     <div className="editor-header">
-      <span>{title}</span>
+      <div className="editor-header-title-group">
+        <span className="editor-header-title">{title}</span>
+      </div>
       <div className="editor-header-actions">
-        {onCollapse && (
+        {onToggle && (
           <button
-            onClick={onCollapse}
-            className="app-btn"
+            onClick={onToggle}
+            className="app-btn editor-header-btn"
             aria-label={isCollapsed ? 'Expand' : 'Collapse'}
             type="button"
           >
@@ -28,7 +30,7 @@ export function EditorHeader({ title, onClear, onCollapse, isCollapsed }: Editor
           </button>
         )}
         <button
-          onClick={onClear} className="app-btn"
+          onClick={onClear} className="app-btn editor-header-btn"
           aria-label="Clear"
           type="button"
         >

@@ -1,14 +1,39 @@
 .console-container {
-  background-color: var(--editor-bg-color);
-  color: var(--app-text-color);
+  background: var(--code-editor-color-surface-muted);
+  color: var(--code-editor-color-text);
   height: 100%;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  border: var(--code-editor-border-width) solid var(--code-editor-color-border-subtle);
+  border-radius: inherit;
+  overflow: hidden;
 }
 
 .console-logs {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  padding: 1rem;
+  font-family: var(--code-editor-font-family-mono);
+  padding: 0.6rem 0.75rem 0.85rem;
   overflow: auto;
   flex: 1;
+  background: var(--code-editor-gradient-console);
+}
+
+.console-log {
+  padding: 0.45rem 0.55rem;
+  border-radius: var(--code-editor-radius-sm);
+  color: var(--code-editor-color-console-text);
+  font-size: var(--code-editor-font-size-console);
+  line-height: 1.45;
+  border: var(--code-editor-border-width) solid var(--code-editor-color-console-log-border);
+  background: var(--code-editor-color-console-log-bg);
+}
+
+.console-log + .console-log {
+  margin-top: 0.5rem;
+}
+
+.console-log--error {
+  color: var(--code-editor-color-console-error-text);
+  border-color: var(--code-editor-color-console-error-border);
+  background: var(--code-editor-color-console-error-bg);
 }
