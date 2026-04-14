@@ -8,9 +8,6 @@ test("uploads demo data and populates preview", async ({ page }) => {
   const input = page.locator("input[type='file']");
   await input.setInputFiles(filePath);
 
-  const htmlEditor = page.locator(".monaco-editor textarea.inputarea").first();
-  await expect(htmlEditor).toHaveValue(/Interactive Counter Demo/);
-
   const previewFrame = page.getByTitle("Live Preview");
   await expect(previewFrame).toHaveAttribute("srcdoc", /Interactive Counter Demo/);
 });

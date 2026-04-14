@@ -2,13 +2,21 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import './App.scss'; // Ensure global styles are included
 
-(window as any).CodeEditor = function (
-  selector: string,
-  options: {
-    scripts?: string[];
-    styles?: string[];
-    [key: string]: any;
-  } = {}
+type CodeEditorOptions = {
+  scripts?: string[];
+  styles?: string[];
+} & Record<string, unknown>;
+
+type CodeEditorInit = (
+  selector: string | Element,
+  options?: CodeEditorOptions
+) => void;
+
+const globalWindow = window as Window & { CodeEditor?: CodeEditorInit };
+
+globalWindow.CodeEditor = function (
+  selector: string | Element,
+  options: CodeEditorOptions = {}
 ) {
   const el =
     typeof selector === "string"

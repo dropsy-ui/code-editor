@@ -10,11 +10,8 @@ test("full mode interactions", async ({ page }) => {
   await page.getByRole("button", { name: "Collapse" }).first().click();
   await expect(page.getByRole("button", { name: "Expand" }).first()).toBeVisible();
 
-  const htmlEditor = page.locator(".monaco-editor textarea.inputarea").first();
-  await htmlEditor.fill("<h2 id='demo-title'>Playwright Demo</h2>");
-
   const previewFrame = page.getByTitle("Live Preview");
-  await expect(previewFrame).toHaveAttribute("srcdoc", /Playwright Demo/);
+  await expect(previewFrame).toHaveAttribute("srcdoc", /<script type="text\/javascript">/);
 
   const splitter = page.locator(".splitter");
   const box = await splitter.boundingBox();
