@@ -1,10 +1,22 @@
 import { ReactNode, useState } from 'react';
 import { CodeEditorStoreContext } from './CodeEditorStore';
 
-export const CodeEditorStoreProvider = ({ children }: { children: ReactNode }) => {
-  const [htmlCode, setHtmlCode] = useState('');
-  const [cssCode, setCssCode] = useState('');
-  const [jsCode, setJsCode] = useState('');
+type CodeEditorStoreProviderProps = {
+  children: ReactNode;
+  initialHtmlCode?: string;
+  initialCssCode?: string;
+  initialJsCode?: string;
+};
+
+export const CodeEditorStoreProvider = ({
+  children,
+  initialHtmlCode = '',
+  initialCssCode = '',
+  initialJsCode = '',
+}: CodeEditorStoreProviderProps) => {
+  const [htmlCode, setHtmlCode] = useState(initialHtmlCode);
+  const [cssCode, setCssCode] = useState(initialCssCode);
+  const [jsCode, setJsCode] = useState(initialJsCode);
   const [logs, setLogs] = useState<Array<{ level: string; message: string }>>([]);
 
   const addLog = (level: string, message: string) => {

@@ -1,7 +1,7 @@
 // SCSS for splitter and layout
 .app-body {
   height: 100%;
-  background: var(--app-bg-color);
+  background: var(--code-editor-color-bg);
 
   .app-main {
     height: 100%;
@@ -23,9 +23,25 @@
 
       .splitter {
         cursor: col-resize;
-        width: 6px;
-        background: var(--app-border-color);
+        width: 0.75rem;
+        flex: 0 0 0.75rem;
+        position: relative;
+        background: transparent;
         z-index: 2;
+
+        &::before {
+          content: "";
+          position: absolute;
+          inset: 0.35rem 0.25rem;
+          border-radius: var(--code-editor-radius-full);
+          background: var(--code-editor-gradient-splitter);
+          transition: background 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        &:hover::before {
+          background: var(--code-editor-gradient-splitter-hover);
+          box-shadow: var(--code-editor-shadow-splitter-focus);
+        }
       }
 
       .preview-section {
@@ -41,9 +57,18 @@
 
         .console-section {
           min-height: 0;
-          background: var(--app-bg-color);
+          background: var(--code-editor-color-bg);
         }
       }
     }
+  }
+}
+
+.app-body.app-body--compact {
+  height: auto;
+
+  .app-main.app-main--compact {
+    height: auto;
+    min-height: 0;
   }
 }

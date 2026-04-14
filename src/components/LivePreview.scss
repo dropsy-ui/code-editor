@@ -5,41 +5,86 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  background: var(--code-editor-color-surface-muted);
+  border: var(--code-editor-border-width) solid var(--code-editor-color-border-subtle);
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.live-preview-outer--fit-content {
+  height: auto;
 }
 
 .live-preview-header {
-  background-color: var(--app-bg-color);
-  color: var(--app-text-color);
-  padding: 0.5rem 1rem;
+  background: var(--code-editor-gradient-header);
+  color: var(--code-editor-color-text);
+  padding: var(--code-editor-spacing-md) var(--code-editor-spacing-xl);
   display: flex;
   align-items: center;
-  font-size: 0.875rem;
-  font-weight: 400;
+  gap: var(--code-editor-spacing-lg);
+  font-size: var(--code-editor-font-size-label);
+  font-weight: var(--code-editor-font-weight-label);
   min-height: 2.5rem;
   height: 2.5rem;
   justify-content: space-between;
+  border-bottom: var(--code-editor-border-width) solid var(--code-editor-color-border);
+  box-shadow: var(--code-editor-shadow-header);
 }
 
 .live-preview-header-actions {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--code-editor-spacing-sm);
+}
+
+.live-preview-layout-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--code-editor-spacing-xs);
+  margin-right: 0.15rem;
+}
+
+.live-preview-layout-btn {
+  padding: 0 0.7rem;
+}
+
+.live-preview-layout-btn.is-active {
+  border-color: rgba(96, 165, 250, 0.42);
+  background: var(--code-editor-gradient-active-tab);
 }
 
 .live-preview-title {
-  font-size: 0.875rem;
-  font-weight: 400;
+  font-size: var(--code-editor-font-size-title);
+  font-weight: var(--code-editor-font-weight-title);
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.live-preview-stage {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0.7rem;
+  background: var(--code-editor-gradient-preview-stage);
+}
+
+.live-preview-stage--fit-content {
+  flex: 0 0 auto;
 }
 
 .live-preview-iframe {
-  background-color: var(--app-preview-bg-color);
+  background-color: var(--code-editor-color-preview-bg);
   width: 100%;
-  height: calc(100% - 2.5rem);
-  border: none;
-  flex: 1 1 auto;
-  min-height: 0;
+  height: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: var(--code-editor-radius-md);
+  box-shadow:
+    var(--code-editor-shadow-panel-elevated),
+    inset 0 1px 0 rgba(255, 255, 255, 0.48);
 }
 
-.preview-section {
-  width: 50%;
+.live-preview-iframe--fit-content {
+  display: block;
+  height: auto;
 }
