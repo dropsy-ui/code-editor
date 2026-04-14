@@ -41,7 +41,7 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "prepublishOnly": "npm run build",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
