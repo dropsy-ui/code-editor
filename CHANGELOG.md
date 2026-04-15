@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/dropsy-ui/code-editor/compare/v1.0.1...v1.1.0) (2026-04-15)
+
+
+### Features
+
+* add initalState property to CodeEditorOptions ([bfd0bd6](https://github.com/dropsy-ui/code-editor/commit/bfd0bd6d5d745bfcdf5c4b1382160b4c83461d20))
+
 ## [1.0.1](https://github.com/dropsy-ui/code-editor/compare/v1.0.0...v1.0.1) (2026-04-14)
 
 
