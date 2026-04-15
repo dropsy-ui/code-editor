@@ -2,6 +2,20 @@
 
 A React-based embeddable code editor with live HTML/CSS/JS preview.
 
+## Screenshots
+
+### Demo gallery
+
+![CodeEditor demo gallery](docs/screenshots/demo-gallery.png)
+
+### Full editor layout
+
+![CodeEditor full layout](docs/screenshots/editor-full.png)
+
+### Compact embedded layout
+
+![CodeEditor compact layout](docs/screenshots/editor-compact.png)
+
 ## Features
 
 - Live HTML, CSS, and JavaScript editing
