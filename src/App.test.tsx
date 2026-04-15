@@ -26,6 +26,15 @@ describe("App layout mode", () => {
     render(<App />);
 
     expect(screen.getByRole("button", { name: "Show code" })).toBeInTheDocument();
+    expect(document.querySelector("#compact-code-drawer")).toBeNull();
+  });
+
+  it("renders compact layout when compact mode is explicitly requested", () => {
+    setSearch("");
+    render(<App layoutModeOverride="compact" />);
+
+    expect(screen.getByRole("button", { name: "Show code" })).toBeInTheDocument();
+    expect(document.querySelector("#compact-code-drawer")).toBeNull();
   });
 
   it("shows drag overlay while splitter is dragging", () => {

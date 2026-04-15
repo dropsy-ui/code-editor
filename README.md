@@ -43,6 +43,7 @@ Use the UMD bundle in a browser page:
   const editor = new CodeEditor('#editor-container', {
     scripts,
     styles,
+    displayMode: 'compact',
     initialState: {
       html: '<h1>Hello</h1>',
       css: 'body { color: hotpink; }',
@@ -51,6 +52,10 @@ Use the UMD bundle in a browser page:
   });
 </script>
 ```
+
+`displayMode` controls the editor layout:
+- `'compact'` for the embedded/mobile-friendly preview-first layout
+- `'full'` for the side-by-side editor and preview layout
 
 ### Third-Party Injection
 
