@@ -171,19 +171,27 @@ describe("CompactPreviewLayout", () => {
     });
   });
 
-  it("clamps preview height on content-height change via postMessage", () => {
+  it("updates preview height and allows it to shrink on content-height change via postMessage", () => {
     renderLayout();
 
-    // Trigger the message handler that LivePreview forwards to onContentHeightChange
+    const iframe = document.querySelector("iframe") as HTMLIFrameElement;
+    expect(iframe).toBeInTheDocument();
+
     act(() => {
       window.dispatchEvent(
-        new MessageEvent("message", { data: { type: "preview-height", height: 9999 } })
+        new MessageEvent("message", { data: { type: "preview-height", height: 360 } })
       );
     });
 
-    // With height clamped to MAX_PREVIEW_HEIGHT (480), the iframe style should reflect that
-    const iframe = document.querySelector("iframe") as HTMLIFrameElement;
-    expect(iframe).toBeInTheDocument();
+    expect(iframe).toHaveStyle({ height: "360px" });
+
+    act(() => {
+      window.dispatchEvent(
+        new MessageEvent("message", { data: { type: "preview-height", height: 160 } })
+      );
+    });
+
+    expect(iframe).toHaveStyle({ height: "160px" });
   });
 
   it("relayouts with explicit dimensions when container size is available", async () => {
@@ -213,6 +221,7 @@ describe("CompactPreviewLayout", () => {
     await waitFor(() => {
       const drawerEditor = document.querySelector(".compact-code-drawer-editor") as HTMLDivElement;
       expect(drawerEditor.style.height).toBe("132px");
+      expect(parseInt(drawerEditor.style.height, 10)).toBeGreaterThan(44);
     });
   });
 });

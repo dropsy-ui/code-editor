@@ -132,4 +132,21 @@ describe("App layout mode", () => {
     expect(screen.getByDisplayValue("body { color: hotpink; }")).toBeInTheDocument();
     expect(screen.getByDisplayValue("console.log('seeded')")).toBeInTheDocument();
   });
+
+  it("accepts a whole initialState object and renders seeded content", () => {
+    setSearch("");
+    render(
+      <App
+        initialState={{
+          html: "<h1>State HTML</h1>",
+          css: "body { color: teal; }",
+          javascript: "console.log('state')",
+        }}
+      />
+    );
+
+    expect(screen.getByDisplayValue("<h1>State HTML</h1>")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("body { color: teal; }")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("console.log('state')")).toBeInTheDocument();
+  });
 });

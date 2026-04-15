@@ -2,6 +2,20 @@
 
 A React-based embeddable code editor with live HTML/CSS/JS preview.
 
+## Screenshots
+
+### Demo gallery
+
+![CodeEditor demo gallery](docs/screenshots/demo-gallery.png)
+
+### Full editor layout
+
+![CodeEditor full layout](docs/screenshots/editor-full.png)
+
+### Compact embedded layout
+
+![CodeEditor compact layout](docs/screenshots/editor-compact.png)
+
 ## Features
 
 - Live HTML, CSS, and JavaScript editing
@@ -28,7 +42,12 @@ Use the UMD bundle in a browser page:
 
   const editor = new CodeEditor('#editor-container', {
     scripts,
-    styles
+    styles,
+    initialState: {
+      html: '<h1>Hello</h1>',
+      css: 'body { color: hotpink; }',
+      javascript: "console.log('hello')"
+    }
   });
 </script>
 ```
@@ -55,6 +74,7 @@ You can pass external URLs through `scripts` and `styles` to load libraries insi
 
 - Export: Click Save to download the current editor state as JSON.
 - Import: Click Upload and select a previously saved JSON file.
+- Programmatic seed: pass either individual props like initialHtmlCode/initialCssCode/initialJsCode or a single initialState object with html/css/javascript keys.
 
 ## Theming
 
