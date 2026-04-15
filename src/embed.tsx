@@ -3,9 +3,12 @@ import App from "./App";
 import type { SandboxState } from "./utils/sandboxState";
 import './App.scss'; // Ensure global styles are included
 
+type DisplayMode = "compact" | "full";
+
 type CodeEditorOptions = {
   scripts?: string[];
   styles?: string[];
+  displayMode?: DisplayMode;
   initialState?: Partial<SandboxState>;
   initialHtmlCode?: string;
   initialCssCode?: string;
@@ -31,6 +34,7 @@ globalWindow.CodeEditor = function (
   createRoot(el).render(
     <App
       {...options}
+      layoutModeOverride={options.displayMode}
       iframeScripts={options.scripts || []}
       iframeStyles={options.styles || []}
     />
