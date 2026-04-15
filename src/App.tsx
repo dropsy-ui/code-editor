@@ -5,6 +5,7 @@ import EditorsColumn from "./components/EditorsColumn";
 import PreviewSection from "./components/PreviewSection";
 import { CodeEditorStoreProvider } from "./context/CodeStoreContext";
 import { useSplitter } from "./hooks/useSplitter";
+import type { SandboxState } from "./utils/sandboxState";
 import "./splitter.scss";
 
 // Accept iframeScripts and iframeStyles as props for embedding
@@ -12,6 +13,7 @@ interface AppProps {
   iframeScripts?: string[];
   iframeStyles?: string[];
   layoutModeOverride?: LayoutMode;
+  initialState?: Partial<SandboxState>;
   initialHtmlCode?: string;
   initialCssCode?: string;
   initialJsCode?: string;
@@ -118,16 +120,21 @@ function AppInner({
 
 function App(props: AppProps) {
   const {
+    initialState,
     initialHtmlCode,
     initialCssCode,
     initialJsCode,
   } = props;
 
+  const resolvedInitialHtmlCode = initialHtmlCode ?? initialState?.html ?? "";
+  const resolvedInitialCssCode = initialCssCode ?? initialState?.css ?? "";
+  const resolvedInitialJsCode = initialJsCode ?? initialState?.javascript ?? "";
+
   return (
     <CodeEditorStoreProvider
-      initialHtmlCode={initialHtmlCode}
-      initialCssCode={initialCssCode}
-      initialJsCode={initialJsCode}
+      initialHtmlCode={resolvedInitialHtmlCode}
+      initialCssCode={resolvedInitialCssCode}
+      initialJsCode={resolvedInitialJsCode}
     >
       <AppInner {...props} />
     </CodeEditorStoreProvider>

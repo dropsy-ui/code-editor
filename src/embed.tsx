@@ -1,10 +1,15 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
+import type { SandboxState } from "./utils/sandboxState";
 import './App.scss'; // Ensure global styles are included
 
 type CodeEditorOptions = {
   scripts?: string[];
   styles?: string[];
+  initialState?: Partial<SandboxState>;
+  initialHtmlCode?: string;
+  initialCssCode?: string;
+  initialJsCode?: string;
 } & Record<string, unknown>;
 
 type CodeEditorInit = (
