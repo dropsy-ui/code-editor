@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/dropsy-ui/code-editor/compare/v1.1.0...v1.2.0) (2026-04-15)
+
+
+### Features
+
+* add displayMode to the CodeEditorOptions ([e801da2](https://github.com/dropsy-ui/code-editor/commit/e801da289b538a9921fcfdf80cbd2a6eb0f30aeb))
+
 # [1.1.0](https://github.com/dropsy-ui/code-editor/compare/v1.0.1...v1.1.0) (2026-04-15)
 
 
