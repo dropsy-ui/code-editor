@@ -27,16 +27,9 @@ const editorOptions = {
   lineHeight: COMPACT_EDITOR_LINE_HEIGHT,
 };
 
-const DEFAULT_PREVIEW_HEIGHT = 220;
-const MIN_PREVIEW_HEIGHT = 140;
-const MAX_PREVIEW_HEIGHT = 480;
-const DEFAULT_DRAWER_HEIGHT = 112;
-const MIN_DRAWER_HEIGHT = 112;
+const DEFAULT_DRAWER_HEIGHT = 44;
+const MIN_DRAWER_HEIGHT = 44;
 const DRAWER_VERTICAL_PADDING = 12;
-
-const clampHeight = (height: number, minHeight: number, maxHeight: number) => {
-  return Math.max(minHeight, Math.min(maxHeight, Math.round(height)));
-};
 
 const clampDrawerHeight = (height: number) => {
   return Math.max(MIN_DRAWER_HEIGHT, Math.round(height));
@@ -75,7 +68,6 @@ const CompactPreviewLayout = ({
   } = useCodeEditorStore();
   const editorRef = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null);
   const editorContainerRef = useRef<HTMLDivElement | null>(null);
-  const [previewHeight, setPreviewHeight] = useState(DEFAULT_PREVIEW_HEIGHT);
   const [drawerHeight, setDrawerHeight] = useState(DEFAULT_DRAWER_HEIGHT);
 
   const currentValue = activeTab === "html" ? htmlCode : activeTab === "css" ? cssCode : jsCode;
@@ -150,12 +142,6 @@ const CompactPreviewLayout = ({
           layoutMode={layoutMode}
           onOpenLayoutInNewWindow={onOpenLayoutInNewWindow}
           fitContent
-          frameHeight={previewHeight}
-          onContentHeightChange={(height) => {
-            const nextHeight = clampHeight(height, MIN_PREVIEW_HEIGHT, MAX_PREVIEW_HEIGHT);
-            // Keep the preview stable when switching layouts: allow growth but avoid sudden shrink.
-            setPreviewHeight((currentHeight) => Math.max(currentHeight, nextHeight));
-          }}
           onUpload={(e) => {
             const file = e.target.files?.[0];
             if (!file) return;

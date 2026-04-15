@@ -5,4 +5,5 @@ export const sharedMonacoEditorOptions = {
   wordWrap: "on" as const,
   lineNumbers: "on" as const,
   tabSize: 2,
+  scrollBeyondLastLine: false,
 };

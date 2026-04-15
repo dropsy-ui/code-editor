@@ -83,6 +83,29 @@ describe("LivePreview", () => {
     expect(onContentHeightChange).not.toHaveBeenCalled();
   });
 
+  it("ignores preview-height messages from unrelated sources", () => {
+    const onContentHeightChange = vi.fn();
+
+    renderWithCodeStore(
+      <LivePreview
+        htmlCode="<div>demo</div>"
+        cssCode=""
+        jsCode=""
+        fitContent
+        onContentHeightChange={onContentHeightChange}
+      />
+    );
+
+    window.dispatchEvent(
+      new MessageEvent("message", {
+        data: { type: "preview-height", height: 500 },
+        source: window,
+      })
+    );
+
+    expect(onContentHeightChange).not.toHaveBeenCalled();
+  });
+
   it("renders layout switcher buttons and calls handler", async () => {
     const user = userEvent.setup();
     const onOpenLayoutInNewWindow = vi.fn();
@@ -120,5 +143,21 @@ describe("LivePreview", () => {
     const iframe = screen.getByTitle("Live Preview") as HTMLIFrameElement;
     expect(iframe).toHaveStyle({ height: "400px" });
     expect(iframe).toHaveClass("live-preview-iframe--fit-content");
+  });
+
+  it("does not hide the iframe before the first fitContent measurement arrives", () => {
+    renderWithCodeStore(
+      <LivePreview
+        htmlCode="<div>demo</div>"
+        cssCode=""
+        jsCode=""
+        fitContent
+      />
+    );
+
+    const iframe = screen.getByTitle("Live Preview") as HTMLIFrameElement;
+    expect(iframe).toHaveClass("live-preview-iframe--fit-content");
+    expect(iframe.style.visibility).not.toBe("hidden");
+    expect(iframe.style.height).not.toBe("0px");
   });
 });
