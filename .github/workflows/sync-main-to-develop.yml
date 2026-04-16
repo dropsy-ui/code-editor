@@ -1,6 +1,7 @@
 name: Sync main to develop
 
 on:
+  workflow_dispatch:
   workflow_run:
     workflows:
       - Release
@@ -8,7 +9,7 @@ on:
       - completed
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: write
 
 concurrency:
@@ -17,24 +18,55 @@ concurrency:
 
 jobs:
   sync:
-    if: github.event.workflow_run.conclusion == 'success' && github.repository_owner == 'dropsy-ui'
+    if: github.repository_owner == 'dropsy-ui' && (github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main'))
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout main
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: main
+          fetch-depth: 0
+
+      - name: Check for commits to sync
+        id: check
+        run: |
+          git fetch origin main develop
+          AHEAD_COUNT=$(git rev-list --count origin/develop..origin/main)
+          echo "ahead_count=$AHEAD_COUNT" >> "$GITHUB_OUTPUT"
+
+          if [ "$AHEAD_COUNT" -eq 0 ]; then
+            echo "No commits to sync from main into develop."
+          else
+            echo "Found $AHEAD_COUNT commit(s) to sync from main into develop."
+          fi
+
+      - name: Check for existing pull request
+        if: steps.check.outputs.ahead_count != '0'
+        id: existing
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(gh pr list \
+            --base develop \
+            --head main \
+            --state open \
+            --json number \
+            --jq '.[0].number // ""')
+          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
 
       - name: Create sync pull request
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          base: develop
-          branch: chore/sync-main-to-develop
-          title: "chore: sync main into develop"
-          body: |
-            Automated sync after a successful release.
-            This PR is intentionally reviewable and auditable.
-          commit-message: "chore: sync main into develop"
-          labels: automated,sync
+        if: steps.check.outputs.ahead_count != '0' && steps.existing.outputs.pr_number == ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --base develop \
+            --head main \
+            --title "chore: sync main into develop" \
+            --body "Automated sync after a successful release.
+
+          This PR is intentionally reviewable and auditable."
+
+      - name: Report existing pull request
+        if: steps.check.outputs.ahead_count != '0' && steps.existing.outputs.pr_number != ''
+        run: echo "Sync PR #${{ steps.existing.outputs.pr_number }} is already open."
