@@ -1,3 +1,13 @@
+# [1.3.0](https://github.com/dropsy-ui/code-editor/compare/v1.2.0...v1.3.0) (2026-04-16)
+
+
+### Features
+
+* add ability to customize text ([#11](https://github.com/dropsy-ui/code-editor/issues/11)) ([c4d6548](https://github.com/dropsy-ui/code-editor/commit/c4d6548fbdedb3e4843754fc0cd78f13176d3f95))
+* add options to provide granular configuration of toggles ([#9](https://github.com/dropsy-ui/code-editor/issues/9)) ([2df3487](https://github.com/dropsy-ui/code-editor/commit/2df3487267ec0cb8970ef8c16a7e8396791cf4c1))
+* add toggleable themes ([#8](https://github.com/dropsy-ui/code-editor/issues/8)) ([d04fca3](https://github.com/dropsy-ui/code-editor/commit/d04fca37e6afb813f7ef2bc7b87a819f79648049))
+* improve a11y ([#10](https://github.com/dropsy-ui/code-editor/issues/10)) ([1f68dd3](https://github.com/dropsy-ui/code-editor/commit/1f68dd3d12357ac8cf7c6940e0b4822c8e22c5f3))
+
 # [1.2.0](https://github.com/dropsy-ui/code-editor/compare/v1.1.0...v1.2.0) (2026-04-15)
 
 
