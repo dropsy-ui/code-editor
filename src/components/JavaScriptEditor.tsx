@@ -1,4 +1,5 @@
 
+import { useCodeEditorMessages } from "../context/CodeEditorMessages";
 import { useCodeEditorStore } from "../context/CodeEditorStore";
 import './JavaScriptEditor.scss';
 import EditorPanel from "./EditorPanel";
@@ -10,10 +11,11 @@ type JavaScriptEditorProps = {
 
 const JavaScriptEditor = ({ expanded, onExpand }: JavaScriptEditorProps) => {
   const { jsCode, setJsCode } = useCodeEditorStore();
+  const messages = useCodeEditorMessages();
 
   return (
     <EditorPanel
-      title="JavaScript"
+      title={messages.javascriptLabel}
       language="javascript"
       value={jsCode}
       onChange={setJsCode}

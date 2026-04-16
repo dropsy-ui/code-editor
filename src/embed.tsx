@@ -1,11 +1,13 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
+import type { CodeEditorMessages } from "./context/CodeEditorMessages";
 import type { SandboxState } from "./utils/sandboxState";
 import './App.scss'; // Ensure global styles are included
 
 type DisplayMode = "compact" | "full";
 
 export type AppTheme = "light" | "dark" | "system";
+export type { CodeEditorMessages } from "./context/CodeEditorMessages";
 
 export type CodeEditorOptions = {
   /** External script URLs to inject into the preview iframe. */
@@ -40,6 +42,8 @@ export type CodeEditorOptions = {
   showJavaScriptEditor?: boolean;
   /** Shows or hides the CSS editor. */
   showCssEditor?: boolean;
+  /** Overrides visible UI copy and aria labels, allowing translated or customized text per editor instance. */
+  messages?: CodeEditorMessages;
 } & Record<string, unknown>;
 
 type CodeEditorInit = (

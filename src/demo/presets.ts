@@ -1,3 +1,5 @@
+import type { CodeEditorOptions } from "../embed";
+
 export type DemoPreset = {
   id: string;
   title: string;
@@ -7,6 +9,7 @@ export type DemoPreset = {
   initialHtmlCode: string;
   initialCssCode: string;
   initialJsCode: string;
+  appOptions?: Partial<CodeEditorOptions>;
 };
 
 export const DEMO_PRESETS: DemoPreset[] = [
@@ -55,5 +58,38 @@ export const DEMO_PRESETS: DemoPreset[] = [
     initialHtmlCode: `<main class="visibility-demo">\n  <h1>Visibility Controls Demo</h1>\n  <p>Use the toggles above this editor to show or hide editor features.</p>\n  <ul>\n    <li>Preview actions can be individually disabled</li>\n    <li>Code access can be hidden entirely</li>\n    <li>HTML, JavaScript, and CSS editors can be controlled separately</li>\n  </ul>\n</main>`,
     initialCssCode: `.visibility-demo {\n  margin: 1rem;\n  padding: 1rem 1.1rem;\n  border-radius: 12px;\n  border: 1px solid #8fb3ff;\n  background: linear-gradient(180deg, #f8fbff, #eef4ff);\n  color: #1f2a44;\n  font-family: ui-sans-serif, system-ui, sans-serif;\n}\n\n.visibility-demo h1 {\n  margin-top: 0;\n}\n\n.visibility-demo ul {\n  padding-left: 1.2rem;\n}`,
     initialJsCode: `console.log("visibility controls demo ready");`,
+  },
+  {
+    id: "localized-messages",
+    title: "Localized UI Example",
+    description: "Demonstrates per-instance translated labels and aria text using the messages option.",
+    iframeScripts: [],
+    iframeStyles: [],
+    initialHtmlCode: `<main class="i18n-demo">\n  <h1>Bonjour tout le monde</h1>\n  <p id="status">Cliquez sur le bouton pour changer le message.</p>\n  <button id="greet">Dire bonjour</button>\n</main>`,
+    initialCssCode: `.i18n-demo {\n  margin: 1rem;\n  padding: 1rem 1.1rem;\n  border-radius: 12px;\n  border: 1px solid #c084fc;\n  background: linear-gradient(180deg, #faf5ff, #f3e8ff);\n  color: #4c1d95;\n  font-family: ui-sans-serif, system-ui, sans-serif;\n}\n\n.i18n-demo h1 {\n  margin-top: 0;\n}\n\n.i18n-demo button {\n  border: none;\n  border-radius: 999px;\n  padding: 0.65rem 1rem;\n  background: #7c3aed;\n  color: white;\n  cursor: pointer;\n}`,
+    initialJsCode: `const status = document.getElementById("status");\ndocument.getElementById("greet").addEventListener("click", () => {\n  status.textContent = "Le message a été mis à jour.";\n  console.log("démo localisée prête");\n});`,
+    appOptions: {
+      messages: {
+        previewTitle: "Aperçu",
+        livePreviewRegionLabel: "Zone d'aperçu",
+        previewSectionLabel: "Aperçu et console",
+        showCode: "Afficher le code",
+        hideCode: "Masquer le code",
+        code: "Code source",
+        openLayoutInNewWindowLabel: "Ouvrir la mise en page dans une nouvelle fenêtre",
+        openFullLayoutLabel: "Ouvrir la vue complète",
+        openCompactLayoutLabel: "Ouvrir la vue compacte",
+        full: "Complet",
+        compact: "Compact",
+        themeLight: "Activer le thème clair",
+        themeDark: "Activer le thème sombre",
+        load: "Charger",
+        save: "Enregistrer",
+        uploadSandboxStateLabel: "Téléverser un fichier d'état",
+        console: "Console",
+        consoleOutputLabel: "Sortie de la console",
+        noConsoleOutput: "Aucune sortie pour le moment.",
+      },
+    },
   },
 ];

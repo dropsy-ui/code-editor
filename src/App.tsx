@@ -3,6 +3,7 @@ import './App.scss';
 import CompactPreviewLayout from "./components/CompactPreviewLayout";
 import EditorsColumn from "./components/EditorsColumn";
 import PreviewSection from "./components/PreviewSection";
+import { CodeEditorMessagesProvider, useCodeEditorMessages, type CodeEditorMessages } from "./context/CodeEditorMessages";
 import { CodeEditorStoreProvider } from "./context/CodeStoreContext";
 import { useCodeEditorStore } from "./context/CodeEditorStore";
 import { useSplitter } from "./hooks/useSplitter";
@@ -30,6 +31,7 @@ interface AppProps {
   showHtmlEditor?: boolean;
   showJavaScriptEditor?: boolean;
   showCssEditor?: boolean;
+  messages?: CodeEditorMessages;
 }
 
 type LayoutMode = "full" | "compact";
@@ -60,6 +62,7 @@ function AppInner({
   showCssEditor = true,
 }: AppProps) {
   const { theme } = useCodeEditorStore();
+  const messages = useCodeEditorMessages();
   const [expanded, setExpanded] = useState({ html: true, js: true, css: true });
   const [urlLayoutMode] = useState<LayoutMode>(getInitialLayoutMode);
   const [isCompactCodeVisible, setIsCompactCodeVisible] = useState(false);
@@ -111,10 +114,10 @@ function AppInner({
       <div
         className={`app-main${isCompactMode ? " app-main--compact" : ""}`}
         role="main"
-        aria-label="Code editor playground"
+        aria-label={messages.playgroundLabel}
       >
         <span id="splitter-instructions" className="app-visually-hidden">
-          Use the left and right arrow keys to resize the editor and preview panels. Hold Shift for larger steps.
+          {messages.splitterInstructions}
         </span>
         {isCompactMode ? (
           <div className="app-compact-main">
@@ -144,7 +147,7 @@ function AppInner({
                 <div
                   className="app-editors-col"
                   role="region"
-                  aria-label="Code editors"
+                  aria-label={messages.codeEditorsLabel}
                   style={{
                     width: `${editorColWidth}%`,
                   }}
@@ -164,7 +167,7 @@ function AppInner({
                   onMouseDown={onSplitterMouseDown}
                   onKeyDown={onSplitterKeyDown}
                   role="separator"
-                  aria-label="Resize editor and preview panels"
+                  aria-label={messages.resizePanelsLabel}
                   aria-orientation="vertical"
                   aria-valuemin={0}
                   aria-valuemax={100}
@@ -177,7 +180,7 @@ function AppInner({
             <div
               className="preview-section"
               role="region"
-              aria-label="Live preview and console"
+              aria-label={messages.previewSectionLabel}
               style={{ width: hasVisibleEditors ? `${100 - editorColWidth}%` : "100%" }}
             >
               <PreviewSection
@@ -205,6 +208,7 @@ function App(props: AppProps) {
     initialCssCode,
     initialJsCode,
     defaultTheme,
+    messages,
   } = props;
 
   const resolvedInitialHtmlCode = initialHtmlCode ?? initialState?.html ?? "";
@@ -212,14 +216,16 @@ function App(props: AppProps) {
   const resolvedInitialJsCode = initialJsCode ?? initialState?.javascript ?? "";
 
   return (
-    <CodeEditorStoreProvider
-      initialHtmlCode={resolvedInitialHtmlCode}
-      initialCssCode={resolvedInitialCssCode}
-      initialJsCode={resolvedInitialJsCode}
-      defaultTheme={defaultTheme}
-    >
-      <AppInner {...props} />
-    </CodeEditorStoreProvider>
+    <CodeEditorMessagesProvider messages={messages}>
+      <CodeEditorStoreProvider
+        initialHtmlCode={resolvedInitialHtmlCode}
+        initialCssCode={resolvedInitialCssCode}
+        initialJsCode={resolvedInitialJsCode}
+        defaultTheme={defaultTheme}
+      >
+        <AppInner {...props} />
+      </CodeEditorStoreProvider>
+    </CodeEditorMessagesProvider>
   );
 }
 

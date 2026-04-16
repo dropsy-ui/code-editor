@@ -106,6 +106,30 @@ Available options:
 
 If `showCode` is `false`, or if all three editor flags are `false`, the embedded editor becomes preview-only. In compact mode, the Show or Hide code button is hidden automatically when there are no visible editors.
 
+### Custom UI Messages
+
+The editor keeps built-in English defaults, but you can override common UI copy per instance through a small `messages` object.
+
+```html
+<script>
+  const editor = new CodeEditor('#editor-container', {
+    displayMode: 'compact',
+    messages: {
+      previewTitle: 'Aperçu',
+      showCode: 'Afficher le code',
+      hideCode: 'Masquer le code',
+      code: 'Code source',
+      save: 'Enregistrer',
+      load: 'Charger',
+      themeLight: 'Activer le thème clair',
+      themeDark: 'Activer le thème sombre'
+    }
+  });
+</script>
+```
+
+For finer accessibility wording, the more explicit `...Label` and region-description keys are still supported, but most consumers should only need the short names above.
+
 ### Third-Party Injection
 
 You can pass external URLs through `scripts` and `styles` to load libraries inside the preview iframe.

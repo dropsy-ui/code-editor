@@ -1,6 +1,7 @@
 import { forwardRef, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Save from "../assets/save.svg";
 import Upload from "../assets/upload.svg";
+import { useCodeEditorMessages } from "../context/CodeEditorMessages";
 import { useCodeEditorStore } from "../context/CodeEditorStore";
 import "./LivePreview.scss";
 
@@ -25,6 +26,13 @@ type LivePreviewProps = {
 
 const MIN_FIT_CONTENT_IFRAME_HEIGHT = 120;
 
+const escapeHtml = (value: string) => value
+  .replace(/&/g, "&amp;")
+  .replace(/</g, "&lt;")
+  .replace(/>/g, "&gt;")
+  .replace(/"/g, "&quot;")
+  .replace(/'/g, "&#39;");
+
 const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
   (
     {
@@ -48,6 +56,7 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
     ref
   ) => {
     const { addLog, theme, toggleTheme } = useCodeEditorStore();
+    const messages = useCodeEditorMessages();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const iframeRef = useRef<HTMLIFrameElement | null>(null);
     const previewDescriptionId = useId();
@@ -218,7 +227,7 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
       <html>
         <body>
           <div style="color: red; font-family: monospace; padding: 1em; background: #fff0f0; border: 1px solid #f00;">
-            Invalid HTML provided. Please check your markup.
+            ${escapeHtml(messages.invalidHtmlMessage)}
           </div>
         </body>
       </html>
@@ -358,7 +367,7 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
         </body>
       </html>
     `,
-      [htmlCode, jsCode, cssCode, iframeScripts, iframeStyles, showError]
+      [htmlCode, jsCode, cssCode, iframeScripts, iframeStyles, messages, showError]
     );
 
     const resolvedFrameHeight = frameHeight ?? measuredFrameHeight;
@@ -367,32 +376,32 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
       <div
         className={`live-preview-outer${fitContent ? " live-preview-outer--fit-content" : ""}`}
         role="region"
-        aria-label="Live preview"
+        aria-label={messages.livePreviewRegionLabel}
         aria-describedby={previewDescriptionId}
       >
         <div className="live-preview-header">
-          <span className="live-preview-title">Live Preview</span>
+          <span className="live-preview-title">{messages.livePreviewTitle}</span>
           <span id={previewDescriptionId} className="app-visually-hidden">
-            Preview output updates automatically as the code changes.
+            {messages.previewAutoUpdateDescription}
           </span>
           <div className="live-preview-header-actions">
             {showModeToggle && onOpenLayoutInNewWindow && layoutMode && (
-              <div className="live-preview-layout-actions" role="group" aria-label="Open layout in new window">
+              <div className="live-preview-layout-actions" role="group" aria-label={messages.openLayoutInNewWindowLabel}>
                 <button
                   type="button"
                   className={`app-btn app-btn--text live-preview-layout-btn${layoutMode === "full" ? " is-active" : ""}`}
                   onClick={() => onOpenLayoutInNewWindow("full")}
-                  aria-label="Open full layout in new window"
+                  aria-label={messages.openFullLayoutLabel}
                 >
-                  Full
+                  {messages.fullLayoutButtonLabel}
                 </button>
                 <button
                   type="button"
                   className={`app-btn app-btn--text live-preview-layout-btn${layoutMode === "compact" ? " is-active" : ""}`}
                   onClick={() => onOpenLayoutInNewWindow("compact")}
-                  aria-label="Open compact layout in new window"
+                  aria-label={messages.openCompactLayoutLabel}
                 >
-                  Compact
+                  {messages.compactLayoutButtonLabel}
                 </button>
               </div>
             )}
@@ -402,7 +411,7 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
                 ref={fileInputRef}
                 className="file-input-hidden"
                 accept=".json"
-                aria-label="Upload sandbox state file"
+                aria-label={messages.uploadSandboxStateLabel}
                 onChange={onUpload}
               />
             )}
@@ -411,7 +420,7 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
                 type="button"
                 onClick={toggleTheme}
                 className="app-btn live-preview-btn live-preview-theme-btn"
-                aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+                aria-label={theme === "dark" ? messages.switchToLightThemeLabel : messages.switchToDarkThemeLabel}
               >
                 {theme === "dark" ? (
                   <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -433,7 +442,7 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 className="app-btn live-preview-btn"
-                aria-label="Load file"
+                aria-label={messages.loadFileLabel}
               >
                 <img src={Upload} alt="" aria-hidden="true" />
               </button>
@@ -444,7 +453,7 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
                 type="button"
                 onClick={onSave}
                 className="app-btn live-preview-btn"
-                aria-label="Save file"
+                aria-label={messages.saveFileLabel}
               >
                 <img src={Save} alt="" aria-hidden="true" />
               </button>
@@ -462,7 +471,7 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
                 ref.current = node;
               }
             }}
-            title="Live Preview"
+            title={messages.livePreviewTitle}
             className={`live-preview-iframe${fitContent ? " live-preview-iframe--fit-content" : ""}`}
             sandbox="allow-scripts"
             srcDoc={srcdoc}

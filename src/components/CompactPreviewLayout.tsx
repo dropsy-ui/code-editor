@@ -1,6 +1,7 @@
 import Editor from "@monaco-editor/react";
 import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { editor as MonacoEditor } from "monaco-editor";
+import { useCodeEditorMessages } from "../context/CodeEditorMessages";
 import { useCodeEditorStore } from "../context/CodeEditorStore";
 import LivePreview from "./LivePreview";
 import { sharedMonacoEditorOptions } from "./monacoOptions";
@@ -83,6 +84,7 @@ const CompactPreviewLayout = ({
     setCssCode,
     theme,
   } = useCodeEditorStore();
+  const messages = useCodeEditorMessages();
   const monacoTheme = theme === "light" ? "vs" : "vs-dark";
   const editorRef = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null);
   const editorContainerRef = useRef<HTMLDivElement | null>(null);
@@ -98,7 +100,11 @@ const CompactPreviewLayout = ({
   const resolvedActiveTab = visibleTabs.includes(activeTab) ? activeTab : (visibleTabs[0] ?? "html");
   const currentValue = resolvedActiveTab === "html" ? htmlCode : resolvedActiveTab === "css" ? cssCode : jsCode;
   const currentLanguage = resolvedActiveTab === "html" ? "html" : resolvedActiveTab === "css" ? "css" : "javascript";
-  const currentTabLabel = resolvedActiveTab === "html" ? "HTML" : resolvedActiveTab === "css" ? "CSS" : "JavaScript";
+  const currentTabLabel = resolvedActiveTab === "html"
+    ? messages.htmlLabel
+    : resolvedActiveTab === "css"
+      ? messages.cssLabel
+      : messages.javascriptLabel;
   const drawerPanelId = `${tabListId}-panel`;
 
   useEffect(() => {
@@ -238,7 +244,7 @@ const CompactPreviewLayout = ({
             aria-expanded={isCodeVisible}
             aria-controls="compact-code-drawer"
           >
-            {isCodeVisible ? "Hide code" : "Show code"}
+            {isCodeVisible ? messages.hideCodeLabel : messages.showCodeLabel}
           </button>
         )}
       </div>
@@ -249,8 +255,8 @@ const CompactPreviewLayout = ({
           id="compact-code-drawer"
         >
           <div className="compact-code-drawer-header">
-            <span className="compact-code-drawer-title">Code</span>
-            <div className="compact-code-drawer-tabs" role="tablist" aria-label="Compact editor tabs">
+            <span className="compact-code-drawer-title">{messages.codeDrawerTitle}</span>
+            <div className="compact-code-drawer-tabs" role="tablist" aria-label={messages.compactEditorTabsLabel}>
               {showHtmlEditor && (
                 <button
                   type="button"
@@ -266,7 +272,7 @@ const CompactPreviewLayout = ({
                   aria-controls={drawerPanelId}
                   tabIndex={resolvedActiveTab === "html" ? 0 : -1}
                 >
-                  HTML
+                  {messages.htmlLabel}
                 </button>
               )}
               {showJavaScriptEditor && (
@@ -284,7 +290,7 @@ const CompactPreviewLayout = ({
                   aria-controls={drawerPanelId}
                   tabIndex={resolvedActiveTab === "javascript" ? 0 : -1}
                 >
-                  JavaScript
+                  {messages.javascriptLabel}
                 </button>
               )}
               {showCssEditor && (
@@ -302,7 +308,7 @@ const CompactPreviewLayout = ({
                   aria-controls={drawerPanelId}
                   tabIndex={resolvedActiveTab === "css" ? 0 : -1}
                 >
-                  CSS
+                  {messages.cssLabel}
                 </button>
               )}
             </div>

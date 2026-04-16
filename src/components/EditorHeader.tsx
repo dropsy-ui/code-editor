@@ -1,6 +1,7 @@
 import ChevronDown from '../assets/chevron-down.svg';
 import ChevronUp from '../assets/chevron-up.svg';
 import Trash from '../assets/trash.svg';
+import { useCodeEditorMessages } from '../context/CodeEditorMessages';
 import './EditorHeader.scss';
 
 interface EditorHeaderProps {
@@ -12,6 +13,8 @@ interface EditorHeaderProps {
 }
 
 export function EditorHeader({ title, onClear, onToggle, isCollapsed, controlsId }: EditorHeaderProps) {
+  const messages = useCodeEditorMessages();
+
   return (
     <div className="editor-header">
       <div className="editor-header-title-group">
@@ -22,7 +25,7 @@ export function EditorHeader({ title, onClear, onToggle, isCollapsed, controlsId
           <button
             onClick={onToggle}
             className="app-btn editor-header-btn"
-            aria-label={isCollapsed ? 'Expand' : 'Collapse'}
+            aria-label={isCollapsed ? messages.expandLabel : messages.collapseLabel}
             aria-expanded={typeof isCollapsed === "boolean" ? !isCollapsed : undefined}
             aria-controls={controlsId}
             type="button"
@@ -35,7 +38,7 @@ export function EditorHeader({ title, onClear, onToggle, isCollapsed, controlsId
         <button
           onClick={onClear}
           className="app-btn editor-header-btn"
-          aria-label="Clear"
+          aria-label={messages.clearLabel}
           type="button"
         >
           <img src={Trash} alt="" aria-hidden="true" />

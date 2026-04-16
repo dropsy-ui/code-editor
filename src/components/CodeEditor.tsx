@@ -1,4 +1,5 @@
 
+import { useCodeEditorMessages } from "../context/CodeEditorMessages";
 import { useCodeEditorStore } from "../context/CodeEditorStore";
 import './CodeEditor.scss';
 import EditorPanel from "./EditorPanel";
@@ -10,10 +11,11 @@ type CodeEditorProps = {
 
 const CodeEditor = ({ expanded, onExpand }: CodeEditorProps) => {
   const { htmlCode, setHtmlCode } = useCodeEditorStore();
+  const messages = useCodeEditorMessages();
 
   return (
     <EditorPanel
-      title="HTML"
+      title={messages.htmlLabel}
       language="html"
       value={htmlCode}
       onChange={setHtmlCode}
