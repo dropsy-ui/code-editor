@@ -1,7 +1,7 @@
 {
   "name": "@dropsy-ui/code-editor",
   "private": false,
-  "version": "1.0.0",
+  "version": "1.2.0",
   "type": "module",
   "description": "A React-based embeddable code editor with live HTML/CSS/JS preview",
   "main": "dist/code-editor.umd.js",
@@ -41,7 +41,7 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "prepublishOnly": "npm run build",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",

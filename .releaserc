@@ -1,4 +1,5 @@
 {
+  "repositoryUrl": "https://github.com/dropsy-ui/code-editor.git",
   "branches": [
     "main",
     "develop"
