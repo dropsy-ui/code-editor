@@ -73,7 +73,8 @@ describe("PreviewSection", () => {
     await waitFor(() => {
       const iframe = screen.getByTitle("Live Preview") as HTMLIFrameElement;
       expect(iframe.srcdoc).toContain("<h3>Partial</h3>");
-      expect(iframe.srcdoc).toContain("<style>\n            \n          </style>");
+      // cssCode is empty — the user CSS slot at the end of the style block is blank
+      expect(iframe.srcdoc).toContain("\n            \n          </style>");
     });
   });
 

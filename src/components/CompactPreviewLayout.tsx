@@ -65,7 +65,9 @@ const CompactPreviewLayout = ({
     setHtmlCode,
     setJsCode,
     setCssCode,
+    theme,
   } = useCodeEditorStore();
+  const monacoTheme = theme === "light" ? "vs" : "vs-dark";
   const editorRef = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null);
   const editorContainerRef = useRef<HTMLDivElement | null>(null);
   const [drawerHeight, setDrawerHeight] = useState(DEFAULT_DRAWER_HEIGHT);
@@ -215,7 +217,7 @@ const CompactPreviewLayout = ({
               loading={null}
               value={currentValue}
               onChange={handleChange}
-              theme="vs-dark"
+              theme={monacoTheme}
               options={editorOptions}
               onMount={(editor) => {
                 editorRef.current = editor;

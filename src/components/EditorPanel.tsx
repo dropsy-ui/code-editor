@@ -1,4 +1,5 @@
 import Editor from "@monaco-editor/react";
+import { useCodeEditorStore } from "../context/CodeEditorStore";
 import { EditorHeader } from "./EditorHeader";
 import { sharedMonacoEditorOptions } from "./monacoOptions";
 
@@ -19,6 +20,8 @@ const EditorPanel = ({
   expanded,
   onToggle,
 }: EditorPanelProps) => {
+  const { theme } = useCodeEditorStore();
+  const monacoTheme = theme === "light" ? "vs" : "vs-dark";
   return (
     <div className="editor-container">
       <EditorHeader
@@ -35,7 +38,7 @@ const EditorPanel = ({
             loading={null}
             value={value}
             onChange={(nextValue) => onChange(nextValue || "")}
-            theme="vs-dark"
+            theme={monacoTheme}
             options={sharedMonacoEditorOptions}
           />
         </div>

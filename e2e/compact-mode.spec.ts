@@ -37,6 +37,21 @@ test("compact mode interactions", async ({ page }) => {
   await expect(page.locator("#compact-code-drawer")).toHaveCount(0);
 });
 
+test("theme toggle works in compact mode", async ({ page }) => {
+  await page.goto("/?demoStandalone=1&layout=compact");
+
+  const toggleBtn = page.getByRole("button", { name: /Switch to (light|dark) theme/ });
+  await expect(toggleBtn).toBeVisible();
+
+  const initialTheme = await page.locator(".app-body").getAttribute("data-theme");
+
+  await toggleBtn.click();
+
+  const toggledTheme = await page.locator(".app-body").getAttribute("data-theme");
+  expect(toggledTheme).not.toBe(initialTheme);
+  expect(["light", "dark"]).toContain(toggledTheme);
+});
+
 test("demo gallery compact preview height stays stable on scroll", async ({ page }) => {
   await page.goto("/");
 

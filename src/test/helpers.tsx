@@ -17,6 +17,8 @@ export const baseCodeEditorStore: CodeEditorStore = {
   logs: [],
   addLog: () => undefined,
   clearLogs: () => undefined,
+  theme: "dark",
+  toggleTheme: () => undefined,
 };
 
 export function renderWithCodeStore(
