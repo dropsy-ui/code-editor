@@ -206,6 +206,35 @@ describe("App layout mode", () => {
     expect(screen.queryByRole("button", { name: "Save file" })).toBeNull();
   });
 
+  it("uses custom UI messages when provided", async () => {
+    const user = userEvent.setup();
+    setSearch("?layout=compact");
+    render(
+      <App
+        messages={{
+          showCode: "Show source",
+          hideCode: "Hide source",
+          code: "Source",
+          html: "Markup",
+          javascript: "Behavior",
+          css: "Styles",
+          previewTitle: "Preview",
+          openFullLayoutLabel: "Open desktop preview",
+          openCompactLayoutLabel: "Open mobile preview",
+        }}
+      />
+    );
+
+    expect(screen.getByRole("button", { name: "Show source" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Show source" }));
+
+    expect(screen.getByText("Source")).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Markup" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Behavior" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Styles" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Hide source" })).toBeInTheDocument();
+  });
+
   it("honors layoutModeOverride over URL query mode", () => {
     setSearch("?layout=compact");
     render(<App layoutModeOverride="full" />);

@@ -1,6 +1,7 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
+import { CodeEditorMessagesProvider } from "../../context/CodeEditorMessages";
 import LivePreview from "../LivePreview";
 import { renderWithCodeStore } from "../../test/helpers";
 import { createJsonFile } from "../../test/fixtures/files";
@@ -105,6 +106,36 @@ describe("LivePreview", () => {
     );
 
     expect(onContentHeightChange).not.toHaveBeenCalled();
+  });
+
+  it("uses custom preview labels when messages are provided", () => {
+    renderWithCodeStore(
+      <CodeEditorMessagesProvider
+        messages={{
+          livePreviewRegionLabel: "Preview area",
+          previewTitle: "Preview pane",
+          save: "Download state",
+          load: "Upload state",
+          openFullLayoutLabel: "Open desktop preview",
+          openCompactLayoutLabel: "Open compact preview",
+        }}
+      >
+        <LivePreview
+          htmlCode=""
+          cssCode=""
+          jsCode=""
+          layoutMode="full"
+          onOpenLayoutInNewWindow={vi.fn()}
+        />
+      </CodeEditorMessagesProvider>
+    );
+
+    expect(screen.getByRole("region", { name: "Preview area" })).toBeInTheDocument();
+    expect(screen.getByTitle("Preview pane")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Upload state" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Download state" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Open desktop preview" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Open compact preview" })).toBeInTheDocument();
   });
 
   it("renders layout switcher buttons and calls handler", async () => {

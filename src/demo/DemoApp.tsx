@@ -13,6 +13,7 @@ const FILTERS: Array<{ id: DemoFilter; label: string }> = [
   { id: "bootstrap", label: "Bootstrap" },
   { id: "tailwind", label: "Tailwind" },
   { id: "visibility-controls", label: "Visibility" },
+  { id: "localized-messages", label: "Localization" },
 ];
 
 const DEFAULT_VISIBILITY_OPTIONS: Required<Pick<CodeEditorOptions,
@@ -129,6 +130,7 @@ function DemoCard({ preset }: { preset: DemoPreset }) {
           initialHtmlCode={preset.initialHtmlCode}
           initialCssCode={preset.initialCssCode}
           initialJsCode={preset.initialJsCode}
+          {...preset.appOptions}
           {...appOptions}
         />
       </div>
