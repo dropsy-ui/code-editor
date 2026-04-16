@@ -32,6 +32,13 @@
   margin-top: 0.5rem;
 }
 
+.console-empty {
+  color: var(--code-editor-color-console-text);
+  opacity: 0.82;
+  font-size: var(--code-editor-font-size-console);
+  line-height: 1.45;
+}
+
 .console-log--error {
   color: var(--code-editor-color-console-error-text);
   border-color: var(--code-editor-color-console-error-border);

@@ -48,6 +48,24 @@ describe("App layout mode", () => {
     expect(container.querySelector(".app-drag-overlay")).toBeNull();
   });
 
+  it("supports keyboard interaction on the splitter", async () => {
+    const user = userEvent.setup();
+    setSearch("");
+    const { container } = render(<App />);
+
+    const splitter = screen.getByRole("separator", { name: "Resize editor and preview panels" });
+    expect(splitter).toHaveAttribute("tabindex", "0");
+    expect(splitter).toHaveAccessibleDescription(/arrow keys/i);
+
+    const editorColumn = container.querySelector(".app-editors-col") as HTMLDivElement;
+    expect(editorColumn.style.width).toBe("50%");
+
+    splitter.focus();
+    await user.keyboard("{ArrowRight}");
+
+    expect(editorColumn.style.width).not.toBe("50%");
+  });
+
   it("opens layout in new window via layout buttons", () => {
     const openSpy = vi.spyOn(window, "open").mockReturnValue(null);
     setSearch("");

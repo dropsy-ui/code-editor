@@ -28,6 +28,7 @@
         position: relative;
         background: transparent;
         z-index: 2;
+        outline: none;
 
         &::before {
           content: "";
@@ -38,7 +39,8 @@
           transition: background 0.2s ease, box-shadow 0.2s ease;
         }
 
-        &:hover::before {
+        &:hover::before,
+        &:focus-visible::before {
           background: var(--code-editor-gradient-splitter-hover);
           box-shadow: var(--code-editor-shadow-splitter-focus);
         }

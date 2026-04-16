@@ -69,6 +69,7 @@ function AppInner({
     isDragging,
     containerRef,
     onSplitterMouseDown,
+    onSplitterKeyDown,
   } = useSplitter(50);
 
   const layoutMode = layoutModeOverride ?? urlLayoutMode;
@@ -107,7 +108,14 @@ function AppInner({
       {isDragging && !isCompactMode && (
         <div className="app-drag-overlay" />
       )}
-      <div className={`app-main${isCompactMode ? " app-main--compact" : ""}`}>
+      <div
+        className={`app-main${isCompactMode ? " app-main--compact" : ""}`}
+        role="main"
+        aria-label="Code editor playground"
+      >
+        <span id="splitter-instructions" className="app-visually-hidden">
+          Use the left and right arrow keys to resize the editor and preview panels. Hold Shift for larger steps.
+        </span>
         {isCompactMode ? (
           <div className="app-compact-main">
             <CompactPreviewLayout
@@ -135,6 +143,8 @@ function AppInner({
               <>
                 <div
                   className="app-editors-col"
+                  role="region"
+                  aria-label="Code editors"
                   style={{
                     width: `${editorColWidth}%`,
                   }}
@@ -152,11 +162,22 @@ function AppInner({
                 <div
                   className="splitter"
                   onMouseDown={onSplitterMouseDown}
+                  onKeyDown={onSplitterKeyDown}
+                  role="separator"
+                  aria-label="Resize editor and preview panels"
+                  aria-orientation="vertical"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={Math.round(editorColWidth)}
+                  aria-describedby="splitter-instructions"
+                  tabIndex={0}
                 />
               </>
             )}
             <div
               className="preview-section"
+              role="region"
+              aria-label="Live preview and console"
               style={{ width: hasVisibleEditors ? `${100 - editorColWidth}%` : "100%" }}
             >
               <PreviewSection

@@ -52,6 +52,7 @@
 .live-preview-layout-btn.is-active {
   border-color: var(--code-editor-color-focus);
   background: var(--code-editor-gradient-active-tab);
+  box-shadow: inset 0 0 0 1px var(--code-editor-color-focus);
 }
 
 .live-preview-title {

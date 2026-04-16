@@ -45,5 +45,21 @@ describe("Console", () => {
     );
 
     expect(screen.getByText("Console")).toBeInTheDocument();
+    expect(screen.getByText("No console output yet.")).toBeInTheDocument();
+  });
+
+  it("exposes console output as a polite live region", () => {
+    render(
+      <CodeEditorStoreContext.Provider
+        value={{
+          ...baseStore,
+          logs: [{ level: "log", message: "hello" }],
+        }}
+      >
+        <Console />
+      </CodeEditorStoreContext.Provider>
+    );
+
+    expect(screen.getByRole("log", { name: "Console output" })).toHaveAttribute("aria-live", "polite");
   });
 });
