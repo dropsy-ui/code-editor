@@ -225,4 +225,17 @@ describe("CompactPreviewLayout", () => {
       expect(parseInt(drawerEditor.style.height, 10)).toBeGreaterThan(44);
     });
   });
+
+  it("supports arrow-key navigation across compact editor tabs", async () => {
+    const user = userEvent.setup();
+    const onTabChange = vi.fn();
+
+    renderLayout({ onTabChange, activeTab: "html" });
+
+    const htmlTab = screen.getByRole("tab", { name: "HTML" });
+    htmlTab.focus();
+    await user.keyboard("{ArrowRight}");
+
+    expect(onTabChange).toHaveBeenCalledWith("javascript");
+  });
 });

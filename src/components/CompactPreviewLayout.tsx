@@ -1,5 +1,5 @@
 import Editor from "@monaco-editor/react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { editor as MonacoEditor } from "monaco-editor";
 import { useCodeEditorStore } from "../context/CodeEditorStore";
 import LivePreview from "./LivePreview";
@@ -86,7 +86,9 @@ const CompactPreviewLayout = ({
   const monacoTheme = theme === "light" ? "vs" : "vs-dark";
   const editorRef = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null);
   const editorContainerRef = useRef<HTMLDivElement | null>(null);
+  const tabButtonRefs = useRef<Partial<Record<CompactEditorTab, HTMLButtonElement | null>>>({});
   const [drawerHeight, setDrawerHeight] = useState(DEFAULT_DRAWER_HEIGHT);
+  const tabListId = useId();
 
   const visibleTabs: CompactEditorTab[] = [
     ...(showHtmlEditor ? ["html" as const] : []),
@@ -96,6 +98,8 @@ const CompactPreviewLayout = ({
   const resolvedActiveTab = visibleTabs.includes(activeTab) ? activeTab : (visibleTabs[0] ?? "html");
   const currentValue = resolvedActiveTab === "html" ? htmlCode : resolvedActiveTab === "css" ? cssCode : jsCode;
   const currentLanguage = resolvedActiveTab === "html" ? "html" : resolvedActiveTab === "css" ? "css" : "javascript";
+  const currentTabLabel = resolvedActiveTab === "html" ? "HTML" : resolvedActiveTab === "css" ? "CSS" : "JavaScript";
+  const drawerPanelId = `${tabListId}-panel`;
 
   useEffect(() => {
     if (!isCodeVisible) {
@@ -154,6 +158,49 @@ const CompactPreviewLayout = ({
     setCodeByTab[resolvedActiveTab](nextValue);
   };
 
+  const focusTab = (tab: CompactEditorTab) => {
+    requestAnimationFrame(() => {
+      tabButtonRefs.current[tab]?.focus();
+    });
+  };
+
+  const handleTabKeyDown = (event: ReactKeyboardEvent<HTMLButtonElement>, tab: CompactEditorTab) => {
+    const currentIndex = visibleTabs.indexOf(tab);
+
+    if (currentIndex === -1) {
+      return;
+    }
+
+    let nextTab: CompactEditorTab | undefined;
+
+    switch (event.key) {
+      case "ArrowRight":
+      case "ArrowDown":
+        nextTab = visibleTabs[(currentIndex + 1) % visibleTabs.length];
+        break;
+      case "ArrowLeft":
+      case "ArrowUp":
+        nextTab = visibleTabs[(currentIndex - 1 + visibleTabs.length) % visibleTabs.length];
+        break;
+      case "Home":
+        nextTab = visibleTabs[0];
+        break;
+      case "End":
+        nextTab = visibleTabs[visibleTabs.length - 1];
+        break;
+      default:
+        break;
+    }
+
+    if (!nextTab) {
+      return;
+    }
+
+    event.preventDefault();
+    onTabChange(nextTab);
+    focusTab(nextTab);
+  };
+
   return (
     <div className={`compact-layout${isCodeVisible ? " compact-layout--docked" : ""}`}>
       <div className="compact-preview-shell">
@@ -207,10 +254,17 @@ const CompactPreviewLayout = ({
               {showHtmlEditor && (
                 <button
                   type="button"
+                  id={`${tabListId}-html-tab`}
+                  ref={(node) => {
+                    tabButtonRefs.current.html = node;
+                  }}
                   className={`app-btn app-btn--text compact-code-tab${resolvedActiveTab === "html" ? " is-active" : ""}`}
                   onClick={() => onTabChange("html")}
+                  onKeyDown={(event) => handleTabKeyDown(event, "html")}
                   role="tab"
                   aria-selected={resolvedActiveTab === "html"}
+                  aria-controls={drawerPanelId}
+                  tabIndex={resolvedActiveTab === "html" ? 0 : -1}
                 >
                   HTML
                 </button>
@@ -218,10 +272,17 @@ const CompactPreviewLayout = ({
               {showJavaScriptEditor && (
                 <button
                   type="button"
+                  id={`${tabListId}-javascript-tab`}
+                  ref={(node) => {
+                    tabButtonRefs.current.javascript = node;
+                  }}
                   className={`app-btn app-btn--text compact-code-tab${resolvedActiveTab === "javascript" ? " is-active" : ""}`}
                   onClick={() => onTabChange("javascript")}
+                  onKeyDown={(event) => handleTabKeyDown(event, "javascript")}
                   role="tab"
                   aria-selected={resolvedActiveTab === "javascript"}
+                  aria-controls={drawerPanelId}
+                  tabIndex={resolvedActiveTab === "javascript" ? 0 : -1}
                 >
                   JavaScript
                 </button>
@@ -229,10 +290,17 @@ const CompactPreviewLayout = ({
               {showCssEditor && (
                 <button
                   type="button"
+                  id={`${tabListId}-css-tab`}
+                  ref={(node) => {
+                    tabButtonRefs.current.css = node;
+                  }}
                   className={`app-btn app-btn--text compact-code-tab${resolvedActiveTab === "css" ? " is-active" : ""}`}
                   onClick={() => onTabChange("css")}
+                  onKeyDown={(event) => handleTabKeyDown(event, "css")}
                   role="tab"
                   aria-selected={resolvedActiveTab === "css"}
+                  aria-controls={drawerPanelId}
+                  tabIndex={resolvedActiveTab === "css" ? 0 : -1}
                 >
                   CSS
                 </button>
@@ -242,6 +310,9 @@ const CompactPreviewLayout = ({
           <div
             ref={editorContainerRef}
             className="compact-code-drawer-editor"
+            id={drawerPanelId}
+            role="tabpanel"
+            aria-labelledby={`${tabListId}-${resolvedActiveTab}-tab`}
             style={{ height: `${drawerHeight}px` }}
           >
             <Editor
@@ -252,7 +323,10 @@ const CompactPreviewLayout = ({
               value={currentValue}
               onChange={handleChange}
               theme={monacoTheme}
-              options={editorOptions}
+              options={{
+                ...editorOptions,
+                ariaLabel: `${currentTabLabel} code editor`,
+              }}
               onMount={(editor) => {
                 editorRef.current = editor;
                 requestAnimationFrame(() => {

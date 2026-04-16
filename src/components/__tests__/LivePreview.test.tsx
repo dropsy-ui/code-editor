@@ -17,6 +17,7 @@ describe("LivePreview", () => {
       />
     );
 
+    expect(screen.getByRole("region", { name: "Live preview" })).toBeInTheDocument();
     const iframe = screen.getByTitle("Live Preview") as HTMLIFrameElement;
     expect(iframe.srcdoc).toContain("<h1>Demo</h1>");
     expect(iframe.srcdoc).toContain("h1 { color: red; }");

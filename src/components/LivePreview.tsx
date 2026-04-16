@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Save from "../assets/save.svg";
 import Upload from "../assets/upload.svg";
 import { useCodeEditorStore } from "../context/CodeEditorStore";
@@ -50,6 +50,7 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
     const { addLog, theme, toggleTheme } = useCodeEditorStore();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const iframeRef = useRef<HTMLIFrameElement | null>(null);
+    const previewDescriptionId = useId();
     const [measuredFrameHeight, setMeasuredFrameHeight] = useState<number | null>(
       frameHeight ?? (fitContent ? MIN_FIT_CONTENT_IFRAME_HEIGHT : null)
     );
@@ -363,9 +364,17 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
     const resolvedFrameHeight = frameHeight ?? measuredFrameHeight;
 
     return (
-      <div className={`live-preview-outer${fitContent ? " live-preview-outer--fit-content" : ""}`}>
+      <div
+        className={`live-preview-outer${fitContent ? " live-preview-outer--fit-content" : ""}`}
+        role="region"
+        aria-label="Live preview"
+        aria-describedby={previewDescriptionId}
+      >
         <div className="live-preview-header">
           <span className="live-preview-title">Live Preview</span>
+          <span id={previewDescriptionId} className="app-visually-hidden">
+            Preview output updates automatically as the code changes.
+          </span>
           <div className="live-preview-header-actions">
             {showModeToggle && onOpenLayoutInNewWindow && layoutMode && (
               <div className="live-preview-layout-actions" role="group" aria-label="Open layout in new window">
@@ -393,6 +402,7 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
                 ref={fileInputRef}
                 className="file-input-hidden"
                 accept=".json"
+                aria-label="Upload sandbox state file"
                 onChange={onUpload}
               />
             )}
@@ -425,7 +435,7 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
                 className="app-btn live-preview-btn"
                 aria-label="Load file"
               >
-                <img src={Upload} alt="Upload" />
+                <img src={Upload} alt="" aria-hidden="true" />
               </button>
             )}
             {showSaveButton && (
@@ -436,7 +446,7 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
                 className="app-btn live-preview-btn"
                 aria-label="Save file"
               >
-                <img src={Save} alt="Save" />
+                <img src={Save} alt="" aria-hidden="true" />
               </button>
             )}
           </div>
