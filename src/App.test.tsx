@@ -48,6 +48,24 @@ describe("App layout mode", () => {
     expect(container.querySelector(".app-drag-overlay")).toBeNull();
   });
 
+  it("supports keyboard interaction on the splitter", async () => {
+    const user = userEvent.setup();
+    setSearch("");
+    const { container } = render(<App />);
+
+    const splitter = screen.getByRole("separator", { name: "Resize editor and preview panels" });
+    expect(splitter).toHaveAttribute("tabindex", "0");
+    expect(splitter).toHaveAccessibleDescription(/arrow keys/i);
+
+    const editorColumn = container.querySelector(".app-editors-col") as HTMLDivElement;
+    expect(editorColumn.style.width).toBe("50%");
+
+    splitter.focus();
+    await user.keyboard("{ArrowRight}");
+
+    expect(editorColumn.style.width).not.toBe("50%");
+  });
+
   it("opens layout in new window via layout buttons", () => {
     const openSpy = vi.spyOn(window, "open").mockReturnValue(null);
     setSearch("");
@@ -119,6 +137,104 @@ describe("App layout mode", () => {
     expect(jsTab).toHaveAttribute("aria-selected", "true");
   });
 
+  it("hides compact code controls when code visibility is disabled", () => {
+    setSearch("?layout=compact");
+    render(<App showCode={false} />);
+
+    expect(screen.queryByRole("button", { name: "Show code" })).toBeNull();
+    expect(document.querySelector("#compact-code-drawer")).toBeNull();
+  });
+
+  it("hides compact code controls when no editors are visible", () => {
+    setSearch("?layout=compact");
+    render(<App showHtmlEditor={false} showJavaScriptEditor={false} showCssEditor={false} />);
+
+    expect(screen.queryByRole("button", { name: "Show code" })).toBeNull();
+    expect(document.querySelector("#compact-code-drawer")).toBeNull();
+  });
+
+  it("falls back to the first visible compact editor tab", async () => {
+    const user = userEvent.setup();
+    setSearch("?layout=compact");
+    render(<App showHtmlEditor={false} showCssEditor={false} />);
+
+    await user.click(screen.getByRole("button", { name: "Show code" }));
+    const jsTab = screen.getByRole("tab", { name: "JavaScript" });
+
+    expect(screen.queryByRole("tab", { name: "HTML" })).toBeNull();
+    expect(screen.queryByRole("tab", { name: "CSS" })).toBeNull();
+    expect(jsTab).toHaveAttribute("aria-selected", "true");
+
+    await user.click(screen.getByRole("button", { name: "Hide code" }));
+    expect(document.querySelector("#compact-code-drawer")).toBeNull();
+  });
+
+  it("renders only the enabled editors in full layout", () => {
+    setSearch("");
+    render(<App showHtmlEditor={false} showCssEditor={false} />);
+
+    expect(screen.queryByText("HTML")).toBeNull();
+    expect(screen.getByText("JavaScript")).toBeInTheDocument();
+    expect(screen.queryByText("CSS")).toBeNull();
+  });
+
+  it("hides the editor column in full layout when code visibility is disabled", () => {
+    setSearch("");
+    const { container } = render(<App showCode={false} />);
+
+    expect(screen.queryByText("HTML")).toBeNull();
+    expect(screen.queryByText("JavaScript")).toBeNull();
+    expect(screen.queryByText("CSS")).toBeNull();
+    expect(container.querySelector(".splitter")).toBeNull();
+  });
+
+  it("hides preview header actions when they are disabled", () => {
+    setSearch("");
+    render(
+      <App
+        showModeToggle={false}
+        showThemeToggle={false}
+        showSaveButton={false}
+        showUploadButton={false}
+      />
+    );
+
+    expect(screen.queryByRole("button", { name: "Open full layout in new window" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Open compact layout in new window" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Switch to (light|dark) theme/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Load file" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Save file" })).toBeNull();
+  });
+
+  it("uses custom UI messages when provided", async () => {
+    const user = userEvent.setup();
+    setSearch("?layout=compact");
+    render(
+      <App
+        messages={{
+          showCode: "Show source",
+          hideCode: "Hide source",
+          code: "Source",
+          html: "Markup",
+          javascript: "Behavior",
+          css: "Styles",
+          previewTitle: "Preview",
+          openFullLayoutLabel: "Open desktop preview",
+          openCompactLayoutLabel: "Open mobile preview",
+        }}
+      />
+    );
+
+    expect(screen.getByRole("button", { name: "Show source" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Show source" }));
+
+    expect(screen.getByText("Source")).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Markup" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Behavior" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Styles" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Hide source" })).toBeInTheDocument();
+  });
+
   it("honors layoutModeOverride over URL query mode", () => {
     setSearch("?layout=compact");
     render(<App layoutModeOverride="full" />);
@@ -157,5 +273,48 @@ describe("App layout mode", () => {
     expect(screen.getByDisplayValue("<h1>State HTML</h1>")).toBeInTheDocument();
     expect(screen.getByDisplayValue("body { color: teal; }")).toBeInTheDocument();
     expect(screen.getByDisplayValue("console.log('state')")).toBeInTheDocument();
+  });
+
+  it("defaults to dark theme when no defaultTheme is given and system prefers dark", () => {
+    setSearch("");
+    vi.stubGlobal("matchMedia", (query: string) => ({ matches: query.includes("dark"), addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+    render(<App />);
+    expect(document.querySelector('[data-theme="dark"]')).toBeInTheDocument();
+    vi.unstubAllGlobals();
+  });
+
+  it("defaults to light theme when no defaultTheme is given and system prefers light", () => {
+    setSearch("");
+    vi.stubGlobal("matchMedia", (_query: string) => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+    render(<App />);
+    expect(document.querySelector('[data-theme="light"]')).toBeInTheDocument();
+    vi.unstubAllGlobals();
+  });
+
+  it("respects defaultTheme='dark' regardless of system preference", () => {
+    setSearch("");
+    vi.stubGlobal("matchMedia", (_query: string) => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+    render(<App defaultTheme="dark" />);
+    expect(document.querySelector('[data-theme="dark"]')).toBeInTheDocument();
+    vi.unstubAllGlobals();
+  });
+
+  it("respects defaultTheme='light' regardless of system preference", () => {
+    setSearch("");
+    vi.stubGlobal("matchMedia", (query: string) => ({ matches: query.includes("dark"), addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+    render(<App defaultTheme="light" />);
+    expect(document.querySelector('[data-theme="light"]')).toBeInTheDocument();
+    vi.unstubAllGlobals();
+  });
+
+  it("toggles theme when the theme toggle button is clicked", async () => {
+    const user = userEvent.setup();
+    setSearch("");
+    render(<App defaultTheme="dark" />);
+    expect(document.querySelector('[data-theme="dark"]')).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Switch to light theme" }));
+    expect(document.querySelector('[data-theme="light"]')).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Switch to dark theme" }));
+    expect(document.querySelector('[data-theme="dark"]')).toBeInTheDocument();
   });
 });

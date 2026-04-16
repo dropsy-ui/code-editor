@@ -1,6 +1,7 @@
 import Editor from "@monaco-editor/react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { editor as MonacoEditor } from "monaco-editor";
+import { useCodeEditorMessages } from "../context/CodeEditorMessages";
 import { useCodeEditorStore } from "../context/CodeEditorStore";
 import LivePreview from "./LivePreview";
 import { sharedMonacoEditorOptions } from "./monacoOptions";
@@ -11,6 +12,7 @@ type CompactEditorTab = "html" | "css" | "javascript";
 
 interface CompactPreviewLayoutProps {
   isCodeVisible: boolean;
+  canShowCode: boolean;
   activeTab: CompactEditorTab;
   onToggleCode: () => void;
   onTabChange: (tab: CompactEditorTab) => void;
@@ -18,6 +20,13 @@ interface CompactPreviewLayoutProps {
   onOpenLayoutInNewWindow: (mode: "full" | "compact") => void;
   iframeScripts?: string[];
   iframeStyles?: string[];
+  showModeToggle?: boolean;
+  showThemeToggle?: boolean;
+  showSaveButton?: boolean;
+  showUploadButton?: boolean;
+  showHtmlEditor?: boolean;
+  showJavaScriptEditor?: boolean;
+  showCssEditor?: boolean;
 }
 
 const COMPACT_EDITOR_LINE_HEIGHT = 20;
@@ -50,6 +59,7 @@ const getDrawerHeightFromCode = (value: string) => {
 
 const CompactPreviewLayout = ({
   isCodeVisible,
+  canShowCode,
   activeTab,
   onToggleCode,
   onTabChange,
@@ -57,6 +67,13 @@ const CompactPreviewLayout = ({
   onOpenLayoutInNewWindow,
   iframeScripts = [],
   iframeStyles = [],
+  showModeToggle = true,
+  showThemeToggle = true,
+  showSaveButton = true,
+  showUploadButton = true,
+  showHtmlEditor = true,
+  showJavaScriptEditor = true,
+  showCssEditor = true,
 }: CompactPreviewLayoutProps) => {
   const {
     htmlCode,
@@ -65,13 +82,30 @@ const CompactPreviewLayout = ({
     setHtmlCode,
     setJsCode,
     setCssCode,
+    theme,
   } = useCodeEditorStore();
+  const messages = useCodeEditorMessages();
+  const monacoTheme = theme === "light" ? "vs" : "vs-dark";
   const editorRef = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null);
   const editorContainerRef = useRef<HTMLDivElement | null>(null);
+  const tabButtonRefs = useRef<Partial<Record<CompactEditorTab, HTMLButtonElement | null>>>({});
   const [drawerHeight, setDrawerHeight] = useState(DEFAULT_DRAWER_HEIGHT);
+  const tabListId = useId();
 
-  const currentValue = activeTab === "html" ? htmlCode : activeTab === "css" ? cssCode : jsCode;
-  const currentLanguage = activeTab === "html" ? "html" : activeTab === "css" ? "css" : "javascript";
+  const visibleTabs: CompactEditorTab[] = [
+    ...(showHtmlEditor ? ["html" as const] : []),
+    ...(showJavaScriptEditor ? ["javascript" as const] : []),
+    ...(showCssEditor ? ["css" as const] : []),
+  ];
+  const resolvedActiveTab = visibleTabs.includes(activeTab) ? activeTab : (visibleTabs[0] ?? "html");
+  const currentValue = resolvedActiveTab === "html" ? htmlCode : resolvedActiveTab === "css" ? cssCode : jsCode;
+  const currentLanguage = resolvedActiveTab === "html" ? "html" : resolvedActiveTab === "css" ? "css" : "javascript";
+  const currentTabLabel = resolvedActiveTab === "html"
+    ? messages.htmlLabel
+    : resolvedActiveTab === "css"
+      ? messages.cssLabel
+      : messages.javascriptLabel;
+  const drawerPanelId = `${tabListId}-panel`;
 
   useEffect(() => {
     if (!isCodeVisible) {
@@ -127,7 +161,50 @@ const CompactPreviewLayout = ({
       css: setCssCode,
       javascript: setJsCode,
     };
-    setCodeByTab[activeTab](nextValue);
+    setCodeByTab[resolvedActiveTab](nextValue);
+  };
+
+  const focusTab = (tab: CompactEditorTab) => {
+    requestAnimationFrame(() => {
+      tabButtonRefs.current[tab]?.focus();
+    });
+  };
+
+  const handleTabKeyDown = (event: ReactKeyboardEvent<HTMLButtonElement>, tab: CompactEditorTab) => {
+    const currentIndex = visibleTabs.indexOf(tab);
+
+    if (currentIndex === -1) {
+      return;
+    }
+
+    let nextTab: CompactEditorTab | undefined;
+
+    switch (event.key) {
+      case "ArrowRight":
+      case "ArrowDown":
+        nextTab = visibleTabs[(currentIndex + 1) % visibleTabs.length];
+        break;
+      case "ArrowLeft":
+      case "ArrowUp":
+        nextTab = visibleTabs[(currentIndex - 1 + visibleTabs.length) % visibleTabs.length];
+        break;
+      case "Home":
+        nextTab = visibleTabs[0];
+        break;
+      case "End":
+        nextTab = visibleTabs[visibleTabs.length - 1];
+        break;
+      default:
+        break;
+    }
+
+    if (!nextTab) {
+      return;
+    }
+
+    event.preventDefault();
+    onTabChange(nextTab);
+    focusTab(nextTab);
   };
 
   return (
@@ -141,6 +218,10 @@ const CompactPreviewLayout = ({
           iframeStyles={iframeStyles}
           layoutMode={layoutMode}
           onOpenLayoutInNewWindow={onOpenLayoutInNewWindow}
+          showModeToggle={showModeToggle}
+          showThemeToggle={showThemeToggle}
+          showSaveButton={showSaveButton}
+          showUploadButton={showUploadButton}
           fitContent
           onUpload={(e) => {
             const file = e.target.files?.[0];
@@ -155,57 +236,89 @@ const CompactPreviewLayout = ({
             });
           }}
         />
-        <button
-          type="button"
-          className="app-btn app-btn--text compact-preview-toggle"
-          onClick={onToggleCode}
-          aria-expanded={isCodeVisible}
-          aria-controls="compact-code-drawer"
-        >
-          {isCodeVisible ? "Hide code" : "Show code"}
-        </button>
+        {canShowCode && (
+          <button
+            type="button"
+            className="app-btn app-btn--text compact-preview-toggle"
+            onClick={onToggleCode}
+            aria-expanded={isCodeVisible}
+            aria-controls="compact-code-drawer"
+          >
+            {isCodeVisible ? messages.hideCodeLabel : messages.showCodeLabel}
+          </button>
+        )}
       </div>
 
-      {isCodeVisible && (
+      {canShowCode && isCodeVisible && (
         <div
           className="compact-code-drawer"
           id="compact-code-drawer"
         >
           <div className="compact-code-drawer-header">
-            <span className="compact-code-drawer-title">Code</span>
-            <div className="compact-code-drawer-tabs" role="tablist" aria-label="Compact editor tabs">
-              <button
-                type="button"
-                className={`app-btn app-btn--text compact-code-tab${activeTab === "html" ? " is-active" : ""}`}
-                onClick={() => onTabChange("html")}
-                role="tab"
-                aria-selected={activeTab === "html"}
-              >
-                HTML
-              </button>
-              <button
-                type="button"
-                className={`app-btn app-btn--text compact-code-tab${activeTab === "javascript" ? " is-active" : ""}`}
-                onClick={() => onTabChange("javascript")}
-                role="tab"
-                aria-selected={activeTab === "javascript"}
-              >
-                JavaScript
-              </button>
-              <button
-                type="button"
-                className={`app-btn app-btn--text compact-code-tab${activeTab === "css" ? " is-active" : ""}`}
-                onClick={() => onTabChange("css")}
-                role="tab"
-                aria-selected={activeTab === "css"}
-              >
-                CSS
-              </button>
+            <span className="compact-code-drawer-title">{messages.codeDrawerTitle}</span>
+            <div className="compact-code-drawer-tabs" role="tablist" aria-label={messages.compactEditorTabsLabel}>
+              {showHtmlEditor && (
+                <button
+                  type="button"
+                  id={`${tabListId}-html-tab`}
+                  ref={(node) => {
+                    tabButtonRefs.current.html = node;
+                  }}
+                  className={`app-btn app-btn--text compact-code-tab${resolvedActiveTab === "html" ? " is-active" : ""}`}
+                  onClick={() => onTabChange("html")}
+                  onKeyDown={(event) => handleTabKeyDown(event, "html")}
+                  role="tab"
+                  aria-selected={resolvedActiveTab === "html"}
+                  aria-controls={drawerPanelId}
+                  tabIndex={resolvedActiveTab === "html" ? 0 : -1}
+                >
+                  {messages.htmlLabel}
+                </button>
+              )}
+              {showJavaScriptEditor && (
+                <button
+                  type="button"
+                  id={`${tabListId}-javascript-tab`}
+                  ref={(node) => {
+                    tabButtonRefs.current.javascript = node;
+                  }}
+                  className={`app-btn app-btn--text compact-code-tab${resolvedActiveTab === "javascript" ? " is-active" : ""}`}
+                  onClick={() => onTabChange("javascript")}
+                  onKeyDown={(event) => handleTabKeyDown(event, "javascript")}
+                  role="tab"
+                  aria-selected={resolvedActiveTab === "javascript"}
+                  aria-controls={drawerPanelId}
+                  tabIndex={resolvedActiveTab === "javascript" ? 0 : -1}
+                >
+                  {messages.javascriptLabel}
+                </button>
+              )}
+              {showCssEditor && (
+                <button
+                  type="button"
+                  id={`${tabListId}-css-tab`}
+                  ref={(node) => {
+                    tabButtonRefs.current.css = node;
+                  }}
+                  className={`app-btn app-btn--text compact-code-tab${resolvedActiveTab === "css" ? " is-active" : ""}`}
+                  onClick={() => onTabChange("css")}
+                  onKeyDown={(event) => handleTabKeyDown(event, "css")}
+                  role="tab"
+                  aria-selected={resolvedActiveTab === "css"}
+                  aria-controls={drawerPanelId}
+                  tabIndex={resolvedActiveTab === "css" ? 0 : -1}
+                >
+                  {messages.cssLabel}
+                </button>
+              )}
             </div>
           </div>
           <div
             ref={editorContainerRef}
             className="compact-code-drawer-editor"
+            id={drawerPanelId}
+            role="tabpanel"
+            aria-labelledby={`${tabListId}-${resolvedActiveTab}-tab`}
             style={{ height: `${drawerHeight}px` }}
           >
             <Editor
@@ -215,8 +328,11 @@ const CompactPreviewLayout = ({
               loading={null}
               value={currentValue}
               onChange={handleChange}
-              theme="vs-dark"
-              options={editorOptions}
+              theme={monacoTheme}
+              options={{
+                ...editorOptions,
+                ariaLabel: `${currentTabLabel} code editor`,
+              }}
               onMount={(editor) => {
                 editorRef.current = editor;
                 requestAnimationFrame(() => {

@@ -8,6 +8,10 @@ interface PreviewSectionProps {
   iframeStyles?: string[];
   layoutMode: "full" | "compact";
   onOpenLayoutInNewWindow: (mode: "full" | "compact") => void;
+  showModeToggle?: boolean;
+  showThemeToggle?: boolean;
+  showSaveButton?: boolean;
+  showUploadButton?: boolean;
 }
 
 const PreviewSection = ({
@@ -15,6 +19,10 @@ const PreviewSection = ({
   iframeStyles = [],
   layoutMode,
   onOpenLayoutInNewWindow,
+  showModeToggle = true,
+  showThemeToggle = true,
+  showSaveButton = true,
+  showUploadButton = true,
 }: PreviewSectionProps) => {
   const { htmlCode, jsCode, cssCode, setHtmlCode, setJsCode, setCssCode } = useCodeEditorStore();
   return (
@@ -28,6 +36,10 @@ const PreviewSection = ({
           iframeStyles={iframeStyles}
           layoutMode={layoutMode}
           onOpenLayoutInNewWindow={onOpenLayoutInNewWindow}
+          showModeToggle={showModeToggle}
+          showThemeToggle={showThemeToggle}
+          showSaveButton={showSaveButton}
+          showUploadButton={showUploadButton}
           onUpload={e => {
             const file = e.target.files?.[0];
             if (!file) return;

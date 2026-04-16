@@ -24,3 +24,19 @@ test("full mode interactions", async ({ page }) => {
 
   await expect(page.locator(".app-editors-col")).toBeVisible();
 });
+
+test("theme toggle switches between light and dark in full mode", async ({ page }) => {
+  await page.goto("/?demoStandalone=1");
+
+  // starts in some theme (dark by default in jsdom/server, but let's normalise)
+  const toggleBtn = page.getByRole("button", { name: /Switch to (light|dark) theme/ });
+  await expect(toggleBtn).toBeVisible();
+
+  const initialTheme = await page.locator(".app-body").getAttribute("data-theme");
+
+  await toggleBtn.click();
+
+  const toggledTheme = await page.locator(".app-body").getAttribute("data-theme");
+  expect(toggledTheme).not.toBe(initialTheme);
+  expect(["light", "dark"]).toContain(toggledTheme);
+});

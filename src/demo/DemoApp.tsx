@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import App from "../App";
+import type { CodeEditorOptions } from "../embed";
 import type { DemoPreset } from "./presets";
 import { DEMO_PRESETS } from "./presets";
 import "./DemoApp.scss";
@@ -11,10 +12,48 @@ const FILTERS: Array<{ id: DemoFilter; label: string }> = [
   { id: "baseline", label: "Baseline" },
   { id: "bootstrap", label: "Bootstrap" },
   { id: "tailwind", label: "Tailwind" },
+  { id: "visibility-controls", label: "Visibility" },
+  { id: "localized-messages", label: "Localization" },
+];
+
+const DEFAULT_VISIBILITY_OPTIONS: Required<Pick<CodeEditorOptions,
+  "showModeToggle" |
+  "showThemeToggle" |
+  "showSaveButton" |
+  "showUploadButton" |
+  "showCode" |
+  "showHtmlEditor" |
+  "showJavaScriptEditor" |
+  "showCssEditor"
+>> = {
+  showModeToggle: true,
+  showThemeToggle: true,
+  showSaveButton: true,
+  showUploadButton: true,
+  showCode: true,
+  showHtmlEditor: true,
+  showJavaScriptEditor: true,
+  showCssEditor: true,
+};
+
+const VISIBILITY_TOGGLE_FIELDS: Array<{ key: keyof typeof DEFAULT_VISIBILITY_OPTIONS; label: string }> = [
+  { key: "showModeToggle", label: "Mode toggle" },
+  { key: "showThemeToggle", label: "Theme toggle" },
+  { key: "showSaveButton", label: "Save button" },
+  { key: "showUploadButton", label: "Upload button" },
+  { key: "showCode", label: "Show code" },
+  { key: "showHtmlEditor", label: "HTML editor" },
+  { key: "showJavaScriptEditor", label: "JavaScript editor" },
+  { key: "showCssEditor", label: "CSS editor" },
 ];
 
 function DemoCard({ preset }: { preset: DemoPreset }) {
   const [layoutMode, setLayoutMode] = useState<"compact" | "full">("compact");
+  const [visibilityOptions, setVisibilityOptions] = useState(DEFAULT_VISIBILITY_OPTIONS);
+  const isVisibilityDemo = preset.id === "visibility-controls";
+  const appOptions = useMemo(() => {
+    return isVisibilityDemo ? visibilityOptions : {};
+  }, [isVisibilityDemo, visibilityOptions]);
 
   return (
     <article className="demo-card">
@@ -58,6 +97,27 @@ function DemoCard({ preset }: { preset: DemoPreset }) {
         </div>
       </section>
 
+      {isVisibilityDemo && (
+        <section className="demo-card__controls" aria-label="Visibility controls demo options">
+          {VISIBILITY_TOGGLE_FIELDS.map(({ key, label }) => (
+            <label key={key} className="demo-card__control-toggle">
+              <input
+                type="checkbox"
+                checked={visibilityOptions[key]}
+                onChange={(event) => {
+                  const checked = event.target.checked;
+                  setVisibilityOptions((current) => ({
+                    ...current,
+                    [key]: checked,
+                  }));
+                }}
+              />
+              <span>{label}</span>
+            </label>
+          ))}
+        </section>
+      )}
+
       <div className={`demo-card__app demo-card__app--${layoutMode}`}>
         <App
           layoutModeOverride={layoutMode}
@@ -70,6 +130,8 @@ function DemoCard({ preset }: { preset: DemoPreset }) {
           initialHtmlCode={preset.initialHtmlCode}
           initialCssCode={preset.initialCssCode}
           initialJsCode={preset.initialJsCode}
+          {...preset.appOptions}
+          {...appOptions}
         />
       </div>
     </article>

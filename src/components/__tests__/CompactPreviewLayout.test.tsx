@@ -11,6 +11,7 @@ import { __getLastLayoutDimensions, __resetMonacoMockState } from "../../test/mo
 function renderLayout(props?: Partial<ComponentProps<typeof CompactPreviewLayout>>) {
   const defaultProps: ComponentProps<typeof CompactPreviewLayout> = {
     isCodeVisible: true,
+    canShowCode: true,
     activeTab: "html",
     onToggleCode: vi.fn(),
     onTabChange: vi.fn(),
@@ -223,5 +224,18 @@ describe("CompactPreviewLayout", () => {
       expect(drawerEditor.style.height).toBe("132px");
       expect(parseInt(drawerEditor.style.height, 10)).toBeGreaterThan(44);
     });
+  });
+
+  it("supports arrow-key navigation across compact editor tabs", async () => {
+    const user = userEvent.setup();
+    const onTabChange = vi.fn();
+
+    renderLayout({ onTabChange, activeTab: "html" });
+
+    const htmlTab = screen.getByRole("tab", { name: "HTML" });
+    htmlTab.focus();
+    await user.keyboard("{ArrowRight}");
+
+    expect(onTabChange).toHaveBeenCalledWith("javascript");
   });
 });

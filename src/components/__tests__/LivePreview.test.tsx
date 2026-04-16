@@ -1,6 +1,7 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
+import { CodeEditorMessagesProvider } from "../../context/CodeEditorMessages";
 import LivePreview from "../LivePreview";
 import { renderWithCodeStore } from "../../test/helpers";
 import { createJsonFile } from "../../test/fixtures/files";
@@ -17,6 +18,7 @@ describe("LivePreview", () => {
       />
     );
 
+    expect(screen.getByRole("region", { name: "Live preview" })).toBeInTheDocument();
     const iframe = screen.getByTitle("Live Preview") as HTMLIFrameElement;
     expect(iframe.srcdoc).toContain("<h1>Demo</h1>");
     expect(iframe.srcdoc).toContain("h1 { color: red; }");
@@ -106,6 +108,36 @@ describe("LivePreview", () => {
     expect(onContentHeightChange).not.toHaveBeenCalled();
   });
 
+  it("uses custom preview labels when messages are provided", () => {
+    renderWithCodeStore(
+      <CodeEditorMessagesProvider
+        messages={{
+          livePreviewRegionLabel: "Preview area",
+          previewTitle: "Preview pane",
+          save: "Download state",
+          load: "Upload state",
+          openFullLayoutLabel: "Open desktop preview",
+          openCompactLayoutLabel: "Open compact preview",
+        }}
+      >
+        <LivePreview
+          htmlCode=""
+          cssCode=""
+          jsCode=""
+          layoutMode="full"
+          onOpenLayoutInNewWindow={vi.fn()}
+        />
+      </CodeEditorMessagesProvider>
+    );
+
+    expect(screen.getByRole("region", { name: "Preview area" })).toBeInTheDocument();
+    expect(screen.getByTitle("Preview pane")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Upload state" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Download state" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Open desktop preview" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Open compact preview" })).toBeInTheDocument();
+  });
+
   it("renders layout switcher buttons and calls handler", async () => {
     const user = userEvent.setup();
     const onOpenLayoutInNewWindow = vi.fn();
@@ -159,5 +191,45 @@ describe("LivePreview", () => {
     expect(iframe).toHaveClass("live-preview-iframe--fit-content");
     expect(iframe.style.visibility).not.toBe("hidden");
     expect(iframe.style.height).not.toBe("0px");
+  });
+
+  it("renders theme toggle button", () => {
+    renderWithCodeStore(<LivePreview htmlCode="" cssCode="" jsCode="" />, { theme: "dark" });
+    expect(screen.getByRole("button", { name: "Switch to light theme" })).toBeInTheDocument();
+  });
+
+  it("shows correct accessible label for light theme state", () => {
+    renderWithCodeStore(<LivePreview htmlCode="" cssCode="" jsCode="" />, { theme: "light" });
+    expect(screen.getByRole("button", { name: "Switch to dark theme" })).toBeInTheDocument();
+  });
+
+  it("calls toggleTheme when theme toggle button is clicked", async () => {
+    const user = userEvent.setup();
+    const toggleTheme = vi.fn();
+    renderWithCodeStore(<LivePreview htmlCode="" cssCode="" jsCode="" />, { theme: "dark", toggleTheme });
+    await user.click(screen.getByRole("button", { name: "Switch to light theme" }));
+    expect(toggleTheme).toHaveBeenCalledTimes(1);
+  });
+
+  it("conditionally hides preview header controls", () => {
+    renderWithCodeStore(
+      <LivePreview
+        htmlCode=""
+        cssCode=""
+        jsCode=""
+        layoutMode="full"
+        onOpenLayoutInNewWindow={vi.fn()}
+        showModeToggle={false}
+        showThemeToggle={false}
+        showUploadButton={false}
+        showSaveButton={false}
+      />
+    );
+
+    expect(screen.queryByRole("button", { name: "Open full layout in new window" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Open compact layout in new window" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Switch to (light|dark) theme/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Load file" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Save file" })).toBeNull();
   });
 });

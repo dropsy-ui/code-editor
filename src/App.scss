@@ -1,4 +1,6 @@
+/* ─── Theme-sensitive tokens (dark defaults; overridden in [data-theme="light"]) ─── */
 :root {
+  /* Colors */
   --code-editor-color-bg: #131417;
   --code-editor-color-surface-muted: #181b21;
   --code-editor-color-border: #3a404c;
@@ -11,6 +13,7 @@
   --code-editor-color-button-active: #40495a;
   --code-editor-color-button-hover-border: #505868;
 
+  /* Gradients */
   --code-editor-gradient-panel: linear-gradient(180deg, rgba(35, 39, 48, 0.88), rgba(24, 27, 33, 0.92));
   --code-editor-gradient-header: linear-gradient(180deg, rgba(43, 49, 61, 0.98), rgba(31, 34, 41, 0.98));
   --code-editor-gradient-button: linear-gradient(180deg, rgba(53, 61, 75, 0.9), rgba(43, 49, 61, 0.9));
@@ -20,12 +23,103 @@
   --code-editor-gradient-console: linear-gradient(180deg, rgba(30, 30, 30, 0.98), rgba(20, 20, 20, 0.98));
   --code-editor-gradient-preview-stage: linear-gradient(180deg, rgba(31, 34, 41, 0.98), rgba(24, 27, 33, 0.98));
 
+  /* Shadows */
+  --code-editor-shadow-panel: 0 12px 24px rgba(0, 0, 0, 0.18);
+  --code-editor-shadow-panel-elevated: 0 14px 30px rgba(0, 0, 0, 0.18);
+  --code-editor-shadow-inset-soft: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --code-editor-shadow-inset-subtle: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  --code-editor-shadow-header: inset 0 -1px 0 rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --code-editor-shadow-focus-ring: 0 0 0 3px rgba(96, 165, 250, 0.2);
+  --code-editor-shadow-splitter-focus: 0 0 0 3px rgba(96, 165, 250, 0.16);
+
+  /* Console */
+  --code-editor-color-console-text: #d1d5db;
+  --code-editor-color-console-log-bg: rgba(24, 27, 33, 0.9);
+  --code-editor-color-console-log-border: rgba(58, 64, 76, 0.55);
+  --code-editor-color-console-error-text: #fecaca;
+  --code-editor-color-console-error-bg: rgba(69, 20, 27, 0.62);
+  --code-editor-color-console-error-border: rgba(248, 113, 113, 0.34);
+
+  /* Scrollbar colors */
+  --code-editor-scrollbar-track-bg: rgba(255, 255, 255, 0.04);
+  --code-editor-scrollbar-thumb-bg: rgba(156, 163, 175, 0.35);
+  --code-editor-scrollbar-thumb-hover-bg: rgba(156, 163, 175, 0.55);
+}
+
+/* ─── Light theme overrides ─── */
+[data-theme="light"] {
+  /* Colors */
+  --code-editor-color-bg: #f1f5f9;
+  --code-editor-color-surface-muted: #f8fafc;
+  --code-editor-color-border: #cbd5e1;
+  --code-editor-color-border-subtle: #e2e8f0;
+  --code-editor-color-text: #0f172a;
+  --code-editor-color-preview-bg: #ffffff;
+  --code-editor-color-focus: #2563eb;
+  --code-editor-color-editor-bg: #ffffff;
+  --code-editor-color-button-hover: #e2e8f0;
+  --code-editor-color-button-active: #cbd5e1;
+  --code-editor-color-button-hover-border: #94a3b8;
+
+  --code-editor-gradient-panel: linear-gradient(180deg, rgba(248, 250, 252, 0.96), rgba(241, 245, 249, 0.98));
+  --code-editor-gradient-header: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
+  --code-editor-gradient-button: linear-gradient(180deg, rgba(248, 250, 252, 0.95), rgba(241, 245, 249, 0.95));
+  --code-editor-gradient-active-tab: linear-gradient(180deg, rgba(219, 234, 254, 0.96), rgba(191, 219, 254, 0.96));
+  --code-editor-gradient-splitter: linear-gradient(180deg, rgba(148, 163, 184, 0.8), rgba(100, 116, 139, 0.8));
+  --code-editor-gradient-splitter-hover: linear-gradient(180deg, rgba(59, 130, 246, 0.85), rgba(37, 99, 235, 0.85));
+  --code-editor-gradient-console: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
+  --code-editor-gradient-preview-stage: linear-gradient(180deg, rgba(248, 250, 252, 0.98), rgba(241, 245, 249, 0.98));
+
+  /* Shadows */
+  --code-editor-shadow-panel: 0 12px 24px rgba(0, 0, 0, 0.06);
+  --code-editor-shadow-panel-elevated: 0 14px 30px rgba(0, 0, 0, 0.06);
+  --code-editor-shadow-inset-soft: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  --code-editor-shadow-inset-subtle: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  --code-editor-shadow-header: inset 0 -1px 0 rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  --code-editor-shadow-focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.25);
+  --code-editor-shadow-splitter-focus: 0 0 0 3px rgba(37, 99, 235, 0.2);
+
+  /* Console */
+  --code-editor-color-console-text: #1e293b;
+  --code-editor-color-console-log-bg: rgba(255, 255, 255, 0.95);
+  --code-editor-color-console-log-border: rgba(203, 213, 225, 0.8);
+  --code-editor-color-console-error-text: #991b1b;
+  --code-editor-color-console-error-bg: rgba(254, 226, 226, 0.8);
+  --code-editor-color-console-error-border: rgba(248, 113, 113, 0.5);
+
+  /* Scrollbar colors */
+  --code-editor-scrollbar-track-bg: rgba(0, 0, 0, 0.04);
+  --code-editor-scrollbar-thumb-bg: rgba(100, 116, 139, 0.35);
+  --code-editor-scrollbar-thumb-hover-bg: rgba(100, 116, 139, 0.55);
+}
+
+/* ─── System-preference fallback (applied before React hydration sets data-theme) ─── */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --code-editor-color-bg: #f1f5f9;
+    --code-editor-color-surface-muted: #f8fafc;
+    --code-editor-color-border: #cbd5e1;
+    --code-editor-color-border-subtle: #e2e8f0;
+    --code-editor-color-text: #0f172a;
+    --code-editor-color-preview-bg: #ffffff;
+    --code-editor-color-focus: #2563eb;
+    --code-editor-color-editor-bg: #ffffff;
+    --code-editor-color-button-hover: #e2e8f0;
+    --code-editor-color-button-active: #cbd5e1;
+    --code-editor-color-button-hover-border: #94a3b8;
+  }
+}
+
+/* ─── Static tokens (theme-invariant) ─── */
+:root {
+  /* Radii */
   --code-editor-radius-xs: 0.55rem;
   --code-editor-radius-sm: 0.65rem;
   --code-editor-radius-md: 0.9rem;
   --code-editor-radius-lg: 0.75rem;
   --code-editor-radius-full: 999px;
 
+  /* Typography scale */
   --code-editor-font-family-base: "InterVariable", sans-serif;
   --code-editor-font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --code-editor-font-size-xs: 0.72rem;
@@ -38,6 +132,7 @@
   --code-editor-font-weight-semibold: 600;
   --code-editor-font-weight-bold: 700;
 
+  /* Semantic typography aliases (remap to restyle components without touching the scale) */
   --code-editor-font-size-title: var(--code-editor-font-size-sm);
   --code-editor-font-size-label: var(--code-editor-font-size-base);
   --code-editor-font-size-button: var(--code-editor-font-size-xs);
@@ -45,14 +140,7 @@
   --code-editor-font-weight-label: var(--code-editor-font-weight-semibold);
   --code-editor-font-weight-button: var(--code-editor-font-weight-bold);
 
-  --code-editor-shadow-panel: 0 12px 24px rgba(0, 0, 0, 0.18);
-  --code-editor-shadow-panel-elevated: 0 14px 30px rgba(0, 0, 0, 0.18);
-  --code-editor-shadow-inset-soft: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  --code-editor-shadow-inset-subtle: inset 0 1px 0 rgba(255, 255, 255, 0.03);
-  --code-editor-shadow-header: inset 0 -1px 0 rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  --code-editor-shadow-focus-ring: 0 0 0 3px rgba(96, 165, 250, 0.2);
-  --code-editor-shadow-splitter-focus: 0 0 0 3px rgba(96, 165, 250, 0.16);
-
+  /* Spacing */
   --code-editor-spacing-2xs: 0.25rem;
   --code-editor-spacing-xs: 0.4rem;
   --code-editor-spacing-sm: 0.5rem;
@@ -62,17 +150,8 @@
 
   --code-editor-border-width: 1px;
 
-  --code-editor-color-console-text: #d1d5db;
-  --code-editor-color-console-log-bg: rgba(24, 27, 33, 0.9);
-  --code-editor-color-console-log-border: rgba(58, 64, 76, 0.55);
-  --code-editor-color-console-error-text: #fecaca;
-  --code-editor-color-console-error-bg: rgba(69, 20, 27, 0.62);
-  --code-editor-color-console-error-border: rgba(248, 113, 113, 0.34);
-
+  /* Scrollbar structure (colours live in the theme-sensitive block above) */
   --code-editor-scrollbar-size: 0.65rem;
-  --code-editor-scrollbar-track-bg: rgba(255, 255, 255, 0.04);
-  --code-editor-scrollbar-thumb-bg: rgba(156, 163, 175, 0.35);
-  --code-editor-scrollbar-thumb-hover-bg: rgba(156, 163, 175, 0.55);
   --code-editor-scrollbar-radius: var(--code-editor-radius-full);
 }
 
@@ -94,12 +173,22 @@ body,
 
 body {
   font-family: var(--code-editor-font-family-base);
-  background:
-    radial-gradient(circle at top, rgba(96, 165, 250, 0.08), transparent 28%),
-    var(--code-editor-color-bg);
+  background: var(--code-editor-color-bg);
   color: var(--code-editor-color-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.app-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .console-section {
@@ -132,6 +221,16 @@ body {
   display: flex;
   height: 100%;
   padding: var(--code-editor-spacing-2xs);
+  background:
+    radial-gradient(circle at top, rgba(96, 165, 250, 0.08), transparent 28%),
+    var(--code-editor-color-bg);
+  color: var(--code-editor-color-text);
+}
+
+[data-theme="light"].app-body {
+  background:
+    radial-gradient(circle at top, rgba(37, 99, 235, 0.06), transparent 28%),
+    var(--code-editor-color-bg);
 }
 
 .app-body--compact {
@@ -139,6 +238,7 @@ body {
   min-height: 0;
   align-items: flex-start;
   overflow: auto;
+  padding: 0;
 }
 
 .app-drag-overlay {
@@ -174,7 +274,7 @@ body {
 
 .app-compact-main {
   flex: 0 0 auto;
-  padding: var(--code-editor-spacing-2xs);
+  padding: 0;
   overflow: auto;
 }
 
@@ -248,6 +348,19 @@ body {
     filter: brightness(0) invert(1);
     opacity: 0.88;
   }
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+    color: var(--code-editor-color-text);
+    opacity: 0.88;
+    flex-shrink: 0;
+  }
+}
+
+[data-theme="light"] .app-btn img {
+  filter: brightness(0);
+  opacity: 0.7;
 }
 
 .app-btn--text {
