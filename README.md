@@ -71,7 +71,40 @@ The editor supports `'light'`, `'dark'`, and `'system'` themes. Pass `defaultThe
 
 If `defaultTheme` is omitted (or set to `'system'`), the editor follows the browser's `prefers-color-scheme` setting and defaults to dark when the browser reports a dark preference, or light otherwise.
 
-A **theme toggle button** (sun/moon icon) is always available in the Live Preview header, next to the Save and Load buttons. Clicking it switches between light and dark for the current session regardless of the initial default.
+A **theme toggle button** (sun/moon icon) is available in the Live Preview header by default, next to the Save and Load buttons. Clicking it switches between light and dark for the current session regardless of the initial default.
+
+### UI Visibility Options
+
+You can selectively hide parts of the embedded UI while keeping the live preview available:
+
+```html
+<script>
+  const editor = new CodeEditor('#editor-container', {
+    displayMode: 'compact',
+    showModeToggle: false,
+    showThemeToggle: true,
+    showSaveButton: false,
+    showUploadButton: false,
+    showCode: true,
+    showHtmlEditor: true,
+    showJavaScriptEditor: false,
+    showCssEditor: true,
+  });
+</script>
+```
+
+Available options:
+
+- `showModeToggle`: show or hide the Full or Compact buttons
+- `showThemeToggle`: show or hide the theme switcher
+- `showSaveButton`: show or hide the Save button
+- `showUploadButton`: show or hide the Upload button
+- `showCode`: show or hide all code-editing UI
+- `showHtmlEditor`: show or hide the HTML editor
+- `showJavaScriptEditor`: show or hide the JavaScript editor
+- `showCssEditor`: show or hide the CSS editor
+
+If `showCode` is `false`, or if all three editor flags are `false`, the embedded editor becomes preview-only. In compact mode, the Show or Hide code button is hidden automatically when there are no visible editors.
 
 ### Third-Party Injection
 

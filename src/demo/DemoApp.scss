@@ -115,6 +115,26 @@
   color: #a5b4fc;
 }
 
+.demo-card__controls {
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.6rem 0.9rem;
+}
+
+.demo-card__control-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #e2e8f0;
+  font-size: 0.86rem;
+}
+
+.demo-card__control-toggle input {
+  accent-color: #60a5fa;
+}
+
 .demo-card__app.demo-card__app--full {
   height: 740px;
 }

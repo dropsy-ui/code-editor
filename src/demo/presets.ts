@@ -46,4 +46,14 @@ export const DEMO_PRESETS: DemoPreset[] = [
     initialCssCode: `/* Tailwind utilities are loaded by script; this file is intentionally minimal. */`,
     initialJsCode: `const message = document.getElementById("message");\n\ndocument.getElementById("tag-a").addEventListener("click", () => {\n  message.textContent = "Selected: Tag A";\n  message.className = "mt-4 rounded-lg bg-emerald-50 p-3 text-emerald-700";\n  console.log("tailwind tag a");\n});\n\ndocument.getElementById("tag-b").addEventListener("click", () => {\n  message.textContent = "Selected: Tag B";\n  message.className = "mt-4 rounded-lg bg-sky-50 p-3 text-sky-700";\n  console.log("tailwind tag b");\n});`,
   },
+  {
+    id: "visibility-controls",
+    title: "Visibility Controls Example",
+    description: "Toggle every new embed visibility option live and see the editor update immediately.",
+    iframeScripts: [],
+    iframeStyles: [],
+    initialHtmlCode: `<main class="visibility-demo">\n  <h1>Visibility Controls Demo</h1>\n  <p>Use the toggles above this editor to show or hide editor features.</p>\n  <ul>\n    <li>Preview actions can be individually disabled</li>\n    <li>Code access can be hidden entirely</li>\n    <li>HTML, JavaScript, and CSS editors can be controlled separately</li>\n  </ul>\n</main>`,
+    initialCssCode: `.visibility-demo {\n  margin: 1rem;\n  padding: 1rem 1.1rem;\n  border-radius: 12px;\n  border: 1px solid #8fb3ff;\n  background: linear-gradient(180deg, #f8fbff, #eef4ff);\n  color: #1f2a44;\n  font-family: ui-sans-serif, system-ui, sans-serif;\n}\n\n.visibility-demo h1 {\n  margin-top: 0;\n}\n\n.visibility-demo ul {\n  padding-left: 1.2rem;\n}`,
+    initialJsCode: `console.log("visibility controls demo ready");`,
+  },
 ];
