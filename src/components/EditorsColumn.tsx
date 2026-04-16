@@ -6,11 +6,13 @@ import JavaScriptEditor from "./JavaScriptEditor";
 interface EditorsColumnProps {
     expanded: { html: boolean; js: boolean; css: boolean };
     setExpanded: React.Dispatch<React.SetStateAction<{ html: boolean; js: boolean; css: boolean }>>;
+    visibleEditors?: { html: boolean; js: boolean; css: boolean };
 }
 
 const EditorsColumn: React.FC<EditorsColumnProps> = ({
     expanded,
     setExpanded,
+    visibleEditors = { html: true, js: true, css: true },
 }) => {
     const editors = [
         {
@@ -32,11 +34,12 @@ const EditorsColumn: React.FC<EditorsColumnProps> = ({
             onExpand: () => setExpanded(e => ({ ...e, css: !e.css })),
         },
     ];
-    const expandedCount = editors.filter(e => e.expanded).length;
+    const renderedEditors = editors.filter(({ key }) => visibleEditors[key as keyof typeof visibleEditors]);
+    const expandedCount = renderedEditors.filter(e => e.expanded).length;
     const flexBasis = expandedCount > 0 ? `${100 / expandedCount}%` : '0%';
     return (
         <>
-            {editors.map(({ key, component: EditorComponent, expanded, onExpand }) => (
+            {renderedEditors.map(({ key, component: EditorComponent, expanded, onExpand }) => (
                 <div
                     key={key}
                     className="editor-section"

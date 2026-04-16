@@ -119,6 +119,75 @@ describe("App layout mode", () => {
     expect(jsTab).toHaveAttribute("aria-selected", "true");
   });
 
+  it("hides compact code controls when code visibility is disabled", () => {
+    setSearch("?layout=compact");
+    render(<App showCode={false} />);
+
+    expect(screen.queryByRole("button", { name: "Show code" })).toBeNull();
+    expect(document.querySelector("#compact-code-drawer")).toBeNull();
+  });
+
+  it("hides compact code controls when no editors are visible", () => {
+    setSearch("?layout=compact");
+    render(<App showHtmlEditor={false} showJavaScriptEditor={false} showCssEditor={false} />);
+
+    expect(screen.queryByRole("button", { name: "Show code" })).toBeNull();
+    expect(document.querySelector("#compact-code-drawer")).toBeNull();
+  });
+
+  it("falls back to the first visible compact editor tab", async () => {
+    const user = userEvent.setup();
+    setSearch("?layout=compact");
+    render(<App showHtmlEditor={false} showCssEditor={false} />);
+
+    await user.click(screen.getByRole("button", { name: "Show code" }));
+    const jsTab = screen.getByRole("tab", { name: "JavaScript" });
+
+    expect(screen.queryByRole("tab", { name: "HTML" })).toBeNull();
+    expect(screen.queryByRole("tab", { name: "CSS" })).toBeNull();
+    expect(jsTab).toHaveAttribute("aria-selected", "true");
+
+    await user.click(screen.getByRole("button", { name: "Hide code" }));
+    expect(document.querySelector("#compact-code-drawer")).toBeNull();
+  });
+
+  it("renders only the enabled editors in full layout", () => {
+    setSearch("");
+    render(<App showHtmlEditor={false} showCssEditor={false} />);
+
+    expect(screen.queryByText("HTML")).toBeNull();
+    expect(screen.getByText("JavaScript")).toBeInTheDocument();
+    expect(screen.queryByText("CSS")).toBeNull();
+  });
+
+  it("hides the editor column in full layout when code visibility is disabled", () => {
+    setSearch("");
+    const { container } = render(<App showCode={false} />);
+
+    expect(screen.queryByText("HTML")).toBeNull();
+    expect(screen.queryByText("JavaScript")).toBeNull();
+    expect(screen.queryByText("CSS")).toBeNull();
+    expect(container.querySelector(".splitter")).toBeNull();
+  });
+
+  it("hides preview header actions when they are disabled", () => {
+    setSearch("");
+    render(
+      <App
+        showModeToggle={false}
+        showThemeToggle={false}
+        showSaveButton={false}
+        showUploadButton={false}
+      />
+    );
+
+    expect(screen.queryByRole("button", { name: "Open full layout in new window" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Open compact layout in new window" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Switch to (light|dark) theme/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Load file" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Save file" })).toBeNull();
+  });
+
   it("honors layoutModeOverride over URL query mode", () => {
     setSearch("?layout=compact");
     render(<App layoutModeOverride="full" />);

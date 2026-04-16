@@ -55,10 +55,11 @@ test("theme toggle works in compact mode", async ({ page }) => {
 test("demo gallery compact preview height stays stable on scroll", async ({ page }) => {
   await page.goto("/");
 
-  const previews = page.locator('iframe[title="Live Preview"]');
-  await expect(previews).toHaveCount(3);
+  const tailwindCard = page.locator(".demo-card").filter({ has: page.getByRole("heading", { name: "Tailwind Example" }) });
+  const lastPreview = tailwindCard.locator('iframe[title="Live Preview"]');
+  await expect(lastPreview).toBeVisible();
 
-  const lastPreview = previews.nth(2);
+  const getPreviewHeight = () => lastPreview.evaluate((iframe) => iframe.getBoundingClientRect().height);
 
   for (let i = 0; i < 4; i += 1) {
     await page.mouse.wheel(0, 900);
@@ -67,16 +68,29 @@ test("demo gallery compact preview height stays stable on scroll", async ({ page
   await expect(lastPreview).toBeVisible();
 
   await expect
-    .poll(async () => lastPreview.evaluate((iframe) => iframe.getBoundingClientRect().height))
+    .poll(async () => getPreviewHeight())
     .toBeGreaterThan(50);
 
-  const heightBeforeExtraScroll = await lastPreview.evaluate((iframe) => iframe.getBoundingClientRect().height);
+  await expect
+    .poll(async () => {
+      const samples: number[] = [];
+
+      for (let i = 0; i < 4; i += 1) {
+        samples.push(await getPreviewHeight());
+        await page.waitForTimeout(200);
+      }
+
+      return Math.max(...samples) - Math.min(...samples);
+    })
+    .toBeLessThanOrEqual(2);
+
+  const heightBeforeExtraScroll = await getPreviewHeight();
 
   for (let i = 0; i < 8; i += 1) {
     await page.mouse.wheel(0, 900);
   }
 
   await expect
-    .poll(async () => lastPreview.evaluate((iframe) => iframe.getBoundingClientRect().height))
+    .poll(async () => getPreviewHeight())
     .toBeLessThanOrEqual(heightBeforeExtraScroll + 2);
 });

@@ -178,4 +178,26 @@ describe("LivePreview", () => {
     await user.click(screen.getByRole("button", { name: "Switch to light theme" }));
     expect(toggleTheme).toHaveBeenCalledTimes(1);
   });
+
+  it("conditionally hides preview header controls", () => {
+    renderWithCodeStore(
+      <LivePreview
+        htmlCode=""
+        cssCode=""
+        jsCode=""
+        layoutMode="full"
+        onOpenLayoutInNewWindow={vi.fn()}
+        showModeToggle={false}
+        showThemeToggle={false}
+        showUploadButton={false}
+        showSaveButton={false}
+      />
+    );
+
+    expect(screen.queryByRole("button", { name: "Open full layout in new window" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Open compact layout in new window" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Switch to (light|dark) theme/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Load file" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Save file" })).toBeNull();
+  });
 });

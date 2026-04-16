@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Save from "../assets/save.svg";
 import Upload from "../assets/upload.svg";
 import { useCodeEditorStore } from "../context/CodeEditorStore";
@@ -17,6 +17,10 @@ type LivePreviewProps = {
   onContentHeightChange?: (height: number) => void;
   fitContent?: boolean;
   frameHeight?: number;
+  showModeToggle?: boolean;
+  showThemeToggle?: boolean;
+  showSaveButton?: boolean;
+  showUploadButton?: boolean;
 };
 
 const MIN_FIT_CONTENT_IFRAME_HEIGHT = 120;
@@ -36,6 +40,10 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
       onContentHeightChange,
       fitContent = false,
       frameHeight,
+      showModeToggle = true,
+      showThemeToggle = true,
+      showSaveButton = true,
+      showUploadButton = true,
     },
     ref
   ) => {
@@ -60,7 +68,45 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
       setMeasuredFrameHeight(null);
     }, [fitContent, frameHeight]);
 
-    useEffect(() => {
+    const applyContentHeight = useCallback((nextHeight: number) => {
+      const normalizedHeight = Math.max(1, Math.ceil(nextHeight));
+
+      if (fitContent && typeof frameHeight !== "number") {
+        const appliedHeight = Math.max(MIN_FIT_CONTENT_IFRAME_HEIGHT, normalizedHeight);
+        setMeasuredFrameHeight((currentHeight) => (currentHeight === appliedHeight ? currentHeight : appliedHeight));
+      }
+
+      onContentHeightChange?.(normalizedHeight);
+    }, [fitContent, frameHeight, onContentHeightChange]);
+
+    const syncFrameHeightFromDocument = useCallback(() => {
+      if (!fitContent || typeof frameHeight === "number") {
+        return;
+      }
+
+      const iframeDocument = iframeRef.current?.contentDocument;
+      const root = iframeDocument?.getElementById("code-editor-preview-root");
+      const body = iframeDocument?.body;
+      const documentElement = iframeDocument?.documentElement;
+
+      if (!root || !body || !documentElement) {
+        return;
+      }
+
+      const measuredHeight = Math.max(
+        root.scrollHeight,
+        root.offsetHeight,
+        root.getBoundingClientRect().height,
+        body.scrollHeight,
+        documentElement.scrollHeight,
+      );
+
+      if (Number.isFinite(measuredHeight) && measuredHeight > 0) {
+        applyContentHeight(measuredHeight);
+      }
+    }, [applyContentHeight, fitContent, frameHeight]);
+
+    useLayoutEffect(() => {
       // Listen for console messages from this iframe only
       const handleMessage = (event: MessageEvent) => {
         const iframeWindow = iframeRef.current?.contentWindow;
@@ -74,21 +120,83 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
         }
 
         if (event.data?.type === "preview-height" && typeof event.data.height === "number") {
-          const nextHeight = Math.max(1, Math.ceil(event.data.height));
-
-          if (fitContent && typeof frameHeight !== "number") {
-            const appliedHeight = Math.max(MIN_FIT_CONTENT_IFRAME_HEIGHT, nextHeight);
-            setMeasuredFrameHeight((currentHeight) => (currentHeight === appliedHeight ? currentHeight : appliedHeight));
-          }
-
-          onContentHeightChange?.(nextHeight);
+          applyContentHeight(event.data.height);
         }
       };
       window.addEventListener("message", handleMessage);
       return () => {
         window.removeEventListener("message", handleMessage);
       };
-    }, [addLog, fitContent, frameHeight, onContentHeightChange]);
+    }, [addLog, applyContentHeight]);
+
+    useLayoutEffect(() => {
+      if (!fitContent || typeof frameHeight === "number") {
+        return;
+      }
+
+      const iframeNode = iframeRef.current;
+
+      if (!iframeNode) {
+        return;
+      }
+
+      const timedMeasurements = [0, 50, 150, 300, 600, 1000]
+        .map((delay) => window.setTimeout(syncFrameHeightFromDocument, delay));
+      const intervalId = window.setInterval(syncFrameHeightFromDocument, 150);
+      const stopPollingTimeoutId = window.setTimeout(() => {
+        window.clearInterval(intervalId);
+      }, 5000);
+
+      let innerResizeObserver: ResizeObserver | undefined;
+
+      const attachInnerObserver = () => {
+        const iframeDocument = iframeNode.contentDocument;
+        const root = iframeDocument?.getElementById("code-editor-preview-root") ?? iframeDocument?.documentElement;
+
+        if (!root) {
+          return;
+        }
+
+        syncFrameHeightFromDocument();
+
+        if ("ResizeObserver" in window) {
+          innerResizeObserver?.disconnect();
+          innerResizeObserver = new ResizeObserver(syncFrameHeightFromDocument);
+          innerResizeObserver.observe(root);
+        }
+      };
+
+      const handleLoad = () => {
+        attachInnerObserver();
+      };
+
+      iframeNode.addEventListener("load", handleLoad);
+
+      if (iframeNode.contentDocument?.readyState === "complete") {
+        attachInnerObserver();
+      }
+
+      let intersectionObserver: IntersectionObserver | undefined;
+
+      if ("IntersectionObserver" in window) {
+        intersectionObserver = new IntersectionObserver((entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            syncFrameHeightFromDocument();
+          }
+        }, { threshold: 0.01 });
+
+        intersectionObserver.observe(iframeNode);
+      }
+
+      return () => {
+        iframeNode.removeEventListener("load", handleLoad);
+        timedMeasurements.forEach((timeoutId) => window.clearTimeout(timeoutId));
+        window.clearInterval(intervalId);
+        window.clearTimeout(stopPollingTimeoutId);
+        innerResizeObserver?.disconnect();
+        intersectionObserver?.disconnect();
+      };
+    }, [fitContent, frameHeight, syncFrameHeightFromDocument, htmlCode, jsCode, cssCode, iframeScripts, iframeStyles]);
 
     // Simple HTML validation (checks for unclosed tags, etc.)
     function isValidHTML(html: string) {
@@ -152,26 +260,41 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
 
               let lastReportedHeight = -1;
               let frameRequested = false;
+              const fitContentMode = ${fitContent ? "true" : "false"};
               const root = document.getElementById('code-editor-preview-root');
 
               const reportHeight = () => {
                 frameRequested = false;
 
                 const body = document.body;
+                const documentElement = document.documentElement;
 
-                if (!body || !root) {
+                if (!body || !root || !documentElement) {
                   return;
                 }
 
+                const viewportHeight = Math.ceil(window.innerHeight || 0);
                 const contentHeight = Math.max(
                   root.scrollHeight,
                   root.offsetHeight,
                   root.getBoundingClientRect().height,
+                  body.scrollHeight,
+                  documentElement.scrollHeight,
                 );
                 const nextHeight = Math.ceil(contentHeight + 1);
+                const hasVerticalOverflow = contentHeight > viewportHeight + 2;
+                const isViewportLockedHeight = viewportHeight > 0 && Math.abs(nextHeight - viewportHeight) <= 2;
+
+                if (lastReportedHeight > 0 && isViewportLockedHeight && !hasVerticalOverflow) {
+                  return;
+                }
 
                 if (Math.abs(nextHeight - lastReportedHeight) <= 1) {
                   return;
+                }
+
+                if (fitContentMode && window.frameElement instanceof HTMLIFrameElement) {
+                  window.frameElement.style.height = nextHeight + 'px';
                 }
 
                 lastReportedHeight = nextHeight;
@@ -184,7 +307,20 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
                 }
 
                 frameRequested = true;
-                window.requestAnimationFrame(reportHeight);
+
+                const runReportHeight = () => {
+                  if (!frameRequested) {
+                    return;
+                  }
+
+                  reportHeight();
+                };
+
+                if (typeof window.requestAnimationFrame === 'function') {
+                  window.requestAnimationFrame(runReportHeight);
+                }
+
+                window.setTimeout(runReportHeight, 0);
               };
 
               console.log = (...args) => sendToParent('log', ...args);
@@ -197,8 +333,23 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
                 resizeObserver.observe(root);
               }
 
-              scheduleReportHeight();
-              setTimeout(scheduleReportHeight, 0);
+              if ('MutationObserver' in window && document.documentElement) {
+                const mutationObserver = new MutationObserver(scheduleReportHeight);
+                mutationObserver.observe(document.documentElement, {
+                  subtree: true,
+                  childList: true,
+                  attributes: true,
+                  characterData: true,
+                });
+              }
+
+              if (document.fonts && 'ready' in document.fonts) {
+                document.fonts.ready.then(scheduleReportHeight).catch(() => {});
+              }
+
+              [0, 50, 150, 300, 600, 1000].forEach((delay) => {
+                window.setTimeout(scheduleReportHeight, delay);
+              });
               ${jsCode.replace(/function\s+(\w+)/g, "window.$1 = function")}
               scheduleReportHeight();
             })();
@@ -216,7 +367,7 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
         <div className="live-preview-header">
           <span className="live-preview-title">Live Preview</span>
           <div className="live-preview-header-actions">
-            {onOpenLayoutInNewWindow && layoutMode && (
+            {showModeToggle && onOpenLayoutInNewWindow && layoutMode && (
               <div className="live-preview-layout-actions" role="group" aria-label="Open layout in new window">
                 <button
                   type="button"
@@ -236,48 +387,58 @@ const LivePreview = forwardRef<HTMLIFrameElement, LivePreviewProps>(
                 </button>
               </div>
             )}
-            <input
-              type="file"
-              ref={fileInputRef}
-              className="file-input-hidden"
-              accept=".json"
-              onChange={onUpload}
-            />
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="app-btn live-preview-btn live-preview-theme-btn"
-              aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-            >
-              {theme === "dark" ? (
-                <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="5" />
-                  <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
-                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                  <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
-                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-                </svg>
-              ) : (
-                <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                </svg>
-              )}
-            </button>
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="app-btn live-preview-btn"
-              aria-label="Load file"
-            >
-              <img src={Upload} alt="Upload" />
-            </button>
-            <button
-              id="live-save-button"
-              onClick={onSave}
-              className="app-btn live-preview-btn"
-              aria-label="Save file"
-            >
-              <img src={Save} alt="Save" />
-            </button>
+            {showUploadButton && (
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="file-input-hidden"
+                accept=".json"
+                onChange={onUpload}
+              />
+            )}
+            {showThemeToggle && (
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="app-btn live-preview-btn live-preview-theme-btn"
+                aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+              >
+                {theme === "dark" ? (
+                  <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="5" />
+                    <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                    <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                  </svg>
+                ) : (
+                  <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                  </svg>
+                )}
+              </button>
+            )}
+            {showUploadButton && (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="app-btn live-preview-btn"
+                aria-label="Load file"
+              >
+                <img src={Upload} alt="Upload" />
+              </button>
+            )}
+            {showSaveButton && (
+              <button
+                id="live-save-button"
+                type="button"
+                onClick={onSave}
+                className="app-btn live-preview-btn"
+                aria-label="Save file"
+              >
+                <img src={Save} alt="Save" />
+              </button>
+            )}
           </div>
         </div>
         <div className={`live-preview-stage${fitContent ? " live-preview-stage--fit-content" : ""}`}>

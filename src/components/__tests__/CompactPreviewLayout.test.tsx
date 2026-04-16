@@ -11,6 +11,7 @@ import { __getLastLayoutDimensions, __resetMonacoMockState } from "../../test/mo
 function renderLayout(props?: Partial<ComponentProps<typeof CompactPreviewLayout>>) {
   const defaultProps: ComponentProps<typeof CompactPreviewLayout> = {
     isCodeVisible: true,
+    canShowCode: true,
     activeTab: "html",
     onToggleCode: vi.fn(),
     onTabChange: vi.fn(),

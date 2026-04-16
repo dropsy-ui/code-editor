@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import './App.scss';
 import CompactPreviewLayout from "./components/CompactPreviewLayout";
 import EditorsColumn from "./components/EditorsColumn";
@@ -22,6 +22,14 @@ interface AppProps {
   initialJsCode?: string;
   newWindowParams?: Record<string, string>;
   defaultTheme?: AppTheme;
+  showModeToggle?: boolean;
+  showThemeToggle?: boolean;
+  showSaveButton?: boolean;
+  showUploadButton?: boolean;
+  showCode?: boolean;
+  showHtmlEditor?: boolean;
+  showJavaScriptEditor?: boolean;
+  showCssEditor?: boolean;
 }
 
 type LayoutMode = "full" | "compact";
@@ -42,6 +50,14 @@ function AppInner({
   iframeStyles = [],
   layoutModeOverride,
   newWindowParams,
+  showModeToggle = true,
+  showThemeToggle = true,
+  showSaveButton = true,
+  showUploadButton = true,
+  showCode = true,
+  showHtmlEditor = true,
+  showJavaScriptEditor = true,
+  showCssEditor = true,
 }: AppProps) {
   const { theme } = useCodeEditorStore();
   const [expanded, setExpanded] = useState({ html: true, js: true, css: true });
@@ -57,6 +73,23 @@ function AppInner({
 
   const layoutMode = layoutModeOverride ?? urlLayoutMode;
   const isCompactMode = layoutMode === "compact";
+  const visibleCompactTabs: CompactEditorTab[] = [
+    ...(showHtmlEditor ? ["html" as const] : []),
+    ...(showJavaScriptEditor ? ["javascript" as const] : []),
+    ...(showCssEditor ? ["css" as const] : []),
+  ];
+  const hasVisibleEditors = showCode && visibleCompactTabs.length > 0;
+
+  useEffect(() => {
+    if (!hasVisibleEditors) {
+      setIsCompactCodeVisible(false);
+      return;
+    }
+
+    if (!visibleCompactTabs.includes(compactEditorTab)) {
+      setCompactEditorTab(visibleCompactTabs[0]);
+    }
+  }, [compactEditorTab, hasVisibleEditors, visibleCompactTabs]);
 
   const openLayoutInNewWindow = (mode: LayoutMode) => {
     const url = new URL(window.location.href);
@@ -79,6 +112,7 @@ function AppInner({
           <div className="app-compact-main">
             <CompactPreviewLayout
               isCodeVisible={isCompactCodeVisible}
+              canShowCode={hasVisibleEditors}
               activeTab={compactEditorTab}
               onToggleCode={() => setIsCompactCodeVisible((current) => !current)}
               onTabChange={setCompactEditorTab}
@@ -86,34 +120,54 @@ function AppInner({
               onOpenLayoutInNewWindow={openLayoutInNewWindow}
               iframeScripts={iframeScripts}
               iframeStyles={iframeStyles}
+              showModeToggle={showModeToggle}
+              showThemeToggle={showThemeToggle}
+              showSaveButton={showSaveButton}
+              showUploadButton={showUploadButton}
+              showHtmlEditor={showHtmlEditor}
+              showJavaScriptEditor={showJavaScriptEditor}
+              showCssEditor={showCssEditor}
             />
           </div>
         ) : (
           <div className="app-editors-row" ref={containerRef}>
-            <div
-              className="app-editors-col"
-              style={{
-                width: `${editorColWidth}%`,
-              }}
-            >
-              <EditorsColumn
-                expanded={expanded}
-                setExpanded={setExpanded}
-              />
-            </div>
-            <div
-              className="splitter"
-              onMouseDown={onSplitterMouseDown}
-            />
+            {hasVisibleEditors && (
+              <>
+                <div
+                  className="app-editors-col"
+                  style={{
+                    width: `${editorColWidth}%`,
+                  }}
+                >
+                  <EditorsColumn
+                    expanded={expanded}
+                    setExpanded={setExpanded}
+                    visibleEditors={{
+                      html: showHtmlEditor,
+                      js: showJavaScriptEditor,
+                      css: showCssEditor,
+                    }}
+                  />
+                </div>
+                <div
+                  className="splitter"
+                  onMouseDown={onSplitterMouseDown}
+                />
+              </>
+            )}
             <div
               className="preview-section"
-              style={{ width: `${100 - editorColWidth}%` }}
+              style={{ width: hasVisibleEditors ? `${100 - editorColWidth}%` : "100%" }}
             >
               <PreviewSection
                 iframeScripts={iframeScripts}
                 iframeStyles={iframeStyles}
                 layoutMode={layoutMode}
                 onOpenLayoutInNewWindow={openLayoutInNewWindow}
+                showModeToggle={showModeToggle}
+                showThemeToggle={showThemeToggle}
+                showSaveButton={showSaveButton}
+                showUploadButton={showUploadButton}
               />
             </div>
           </div>

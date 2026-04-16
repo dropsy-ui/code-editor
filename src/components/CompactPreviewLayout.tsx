@@ -11,6 +11,7 @@ type CompactEditorTab = "html" | "css" | "javascript";
 
 interface CompactPreviewLayoutProps {
   isCodeVisible: boolean;
+  canShowCode: boolean;
   activeTab: CompactEditorTab;
   onToggleCode: () => void;
   onTabChange: (tab: CompactEditorTab) => void;
@@ -18,6 +19,13 @@ interface CompactPreviewLayoutProps {
   onOpenLayoutInNewWindow: (mode: "full" | "compact") => void;
   iframeScripts?: string[];
   iframeStyles?: string[];
+  showModeToggle?: boolean;
+  showThemeToggle?: boolean;
+  showSaveButton?: boolean;
+  showUploadButton?: boolean;
+  showHtmlEditor?: boolean;
+  showJavaScriptEditor?: boolean;
+  showCssEditor?: boolean;
 }
 
 const COMPACT_EDITOR_LINE_HEIGHT = 20;
@@ -50,6 +58,7 @@ const getDrawerHeightFromCode = (value: string) => {
 
 const CompactPreviewLayout = ({
   isCodeVisible,
+  canShowCode,
   activeTab,
   onToggleCode,
   onTabChange,
@@ -57,6 +66,13 @@ const CompactPreviewLayout = ({
   onOpenLayoutInNewWindow,
   iframeScripts = [],
   iframeStyles = [],
+  showModeToggle = true,
+  showThemeToggle = true,
+  showSaveButton = true,
+  showUploadButton = true,
+  showHtmlEditor = true,
+  showJavaScriptEditor = true,
+  showCssEditor = true,
 }: CompactPreviewLayoutProps) => {
   const {
     htmlCode,
@@ -72,8 +88,14 @@ const CompactPreviewLayout = ({
   const editorContainerRef = useRef<HTMLDivElement | null>(null);
   const [drawerHeight, setDrawerHeight] = useState(DEFAULT_DRAWER_HEIGHT);
 
-  const currentValue = activeTab === "html" ? htmlCode : activeTab === "css" ? cssCode : jsCode;
-  const currentLanguage = activeTab === "html" ? "html" : activeTab === "css" ? "css" : "javascript";
+  const visibleTabs: CompactEditorTab[] = [
+    ...(showHtmlEditor ? ["html" as const] : []),
+    ...(showJavaScriptEditor ? ["javascript" as const] : []),
+    ...(showCssEditor ? ["css" as const] : []),
+  ];
+  const resolvedActiveTab = visibleTabs.includes(activeTab) ? activeTab : (visibleTabs[0] ?? "html");
+  const currentValue = resolvedActiveTab === "html" ? htmlCode : resolvedActiveTab === "css" ? cssCode : jsCode;
+  const currentLanguage = resolvedActiveTab === "html" ? "html" : resolvedActiveTab === "css" ? "css" : "javascript";
 
   useEffect(() => {
     if (!isCodeVisible) {
@@ -129,7 +151,7 @@ const CompactPreviewLayout = ({
       css: setCssCode,
       javascript: setJsCode,
     };
-    setCodeByTab[activeTab](nextValue);
+    setCodeByTab[resolvedActiveTab](nextValue);
   };
 
   return (
@@ -143,6 +165,10 @@ const CompactPreviewLayout = ({
           iframeStyles={iframeStyles}
           layoutMode={layoutMode}
           onOpenLayoutInNewWindow={onOpenLayoutInNewWindow}
+          showModeToggle={showModeToggle}
+          showThemeToggle={showThemeToggle}
+          showSaveButton={showSaveButton}
+          showUploadButton={showUploadButton}
           fitContent
           onUpload={(e) => {
             const file = e.target.files?.[0];
@@ -157,18 +183,20 @@ const CompactPreviewLayout = ({
             });
           }}
         />
-        <button
-          type="button"
-          className="app-btn app-btn--text compact-preview-toggle"
-          onClick={onToggleCode}
-          aria-expanded={isCodeVisible}
-          aria-controls="compact-code-drawer"
-        >
-          {isCodeVisible ? "Hide code" : "Show code"}
-        </button>
+        {canShowCode && (
+          <button
+            type="button"
+            className="app-btn app-btn--text compact-preview-toggle"
+            onClick={onToggleCode}
+            aria-expanded={isCodeVisible}
+            aria-controls="compact-code-drawer"
+          >
+            {isCodeVisible ? "Hide code" : "Show code"}
+          </button>
+        )}
       </div>
 
-      {isCodeVisible && (
+      {canShowCode && isCodeVisible && (
         <div
           className="compact-code-drawer"
           id="compact-code-drawer"
@@ -176,33 +204,39 @@ const CompactPreviewLayout = ({
           <div className="compact-code-drawer-header">
             <span className="compact-code-drawer-title">Code</span>
             <div className="compact-code-drawer-tabs" role="tablist" aria-label="Compact editor tabs">
-              <button
-                type="button"
-                className={`app-btn app-btn--text compact-code-tab${activeTab === "html" ? " is-active" : ""}`}
-                onClick={() => onTabChange("html")}
-                role="tab"
-                aria-selected={activeTab === "html"}
-              >
-                HTML
-              </button>
-              <button
-                type="button"
-                className={`app-btn app-btn--text compact-code-tab${activeTab === "javascript" ? " is-active" : ""}`}
-                onClick={() => onTabChange("javascript")}
-                role="tab"
-                aria-selected={activeTab === "javascript"}
-              >
-                JavaScript
-              </button>
-              <button
-                type="button"
-                className={`app-btn app-btn--text compact-code-tab${activeTab === "css" ? " is-active" : ""}`}
-                onClick={() => onTabChange("css")}
-                role="tab"
-                aria-selected={activeTab === "css"}
-              >
-                CSS
-              </button>
+              {showHtmlEditor && (
+                <button
+                  type="button"
+                  className={`app-btn app-btn--text compact-code-tab${resolvedActiveTab === "html" ? " is-active" : ""}`}
+                  onClick={() => onTabChange("html")}
+                  role="tab"
+                  aria-selected={resolvedActiveTab === "html"}
+                >
+                  HTML
+                </button>
+              )}
+              {showJavaScriptEditor && (
+                <button
+                  type="button"
+                  className={`app-btn app-btn--text compact-code-tab${resolvedActiveTab === "javascript" ? " is-active" : ""}`}
+                  onClick={() => onTabChange("javascript")}
+                  role="tab"
+                  aria-selected={resolvedActiveTab === "javascript"}
+                >
+                  JavaScript
+                </button>
+              )}
+              {showCssEditor && (
+                <button
+                  type="button"
+                  className={`app-btn app-btn--text compact-code-tab${resolvedActiveTab === "css" ? " is-active" : ""}`}
+                  onClick={() => onTabChange("css")}
+                  role="tab"
+                  aria-selected={resolvedActiveTab === "css"}
+                >
+                  CSS
+                </button>
+              )}
             </div>
           </div>
           <div
