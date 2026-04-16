@@ -57,6 +57,22 @@ Use the UMD bundle in a browser page:
 - `'compact'` for the embedded/mobile-friendly preview-first layout
 - `'full'` for the side-by-side editor and preview layout
 
+### Theme
+
+The editor supports `'light'`, `'dark'`, and `'system'` themes. Pass `defaultTheme` to set an initial preference:
+
+```html
+<script>
+  const editor = new CodeEditor('#editor-container', {
+    defaultTheme: 'dark', // 'light' | 'dark' | 'system'
+  });
+</script>
+```
+
+If `defaultTheme` is omitted (or set to `'system'`), the editor follows the browser's `prefers-color-scheme` setting and defaults to dark when the browser reports a dark preference, or light otherwise.
+
+A **theme toggle button** (sun/moon icon) is always available in the Live Preview header, next to the Save and Load buttons. Clicking it switches between light and dark for the current session regardless of the initial default.
+
 ### Third-Party Injection
 
 You can pass external URLs through `scripts` and `styles` to load libraries inside the preview iframe.
@@ -83,37 +99,7 @@ You can pass external URLs through `scripts` and `styles` to load libraries insi
 
 ## Theming
 
-CodeEditor exposes consumer-facing CSS custom properties prefixed with `--code-editor-`.
-Override them in your app's `:root` (or a container selector) to theme the editor.
-
-```css
-:root {
-  --code-editor-color-bg: #101317;
-  --code-editor-color-surface-muted: #161b24;
-  --code-editor-color-text: #e5e7eb;
-  --code-editor-radius-lg: 1rem;
-  --code-editor-font-family-base: "IBM Plex Sans", sans-serif;
-  --code-editor-font-size-title: 0.8rem;
-  --code-editor-shadow-panel: 0 10px 28px rgba(0, 0, 0, 0.24);
-}
-```
-
-Token groups currently supported:
-
-- Colors: surfaces, text, focus, preview background, editor background, button/console states
-- Gradients: panel, header, button, active tabs, splitter, console, preview stage
-- Radii: xs, sm, md, lg, full
-- Typography: base/mono families, font scale, weights, semantic aliases (title, label, button)
-- Shadows: panel, elevated panel, inset, header, focus ring, splitter focus
-- Spacing: 2xs through xl
-- Border widths: shared border width token
-- Scrollbar: size, track, thumb, hover, radius
-
-Notes:
-
-- This applies to library styles in `src/App.scss`, `src/components/*.scss`, and `src/splitter.scss`.
-- Demo-only styles in `src/demo/**` are excluded.
-- Motion/easing tokens are not included in this pass.
+Override any `--code-editor-*` CSS custom property in your app's `:root` (or any ancestor selector) to restyle the editor without touching library source. See [docs/THEMING.md](docs/THEMING.md) for the full variable reference — dark defaults, light-theme values, and guidance on per-instance overrides.
 
 ## Development Demo
 

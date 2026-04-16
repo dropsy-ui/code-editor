@@ -160,4 +160,22 @@ describe("LivePreview", () => {
     expect(iframe.style.visibility).not.toBe("hidden");
     expect(iframe.style.height).not.toBe("0px");
   });
+
+  it("renders theme toggle button", () => {
+    renderWithCodeStore(<LivePreview htmlCode="" cssCode="" jsCode="" />, { theme: "dark" });
+    expect(screen.getByRole("button", { name: "Switch to light theme" })).toBeInTheDocument();
+  });
+
+  it("shows correct accessible label for light theme state", () => {
+    renderWithCodeStore(<LivePreview htmlCode="" cssCode="" jsCode="" />, { theme: "light" });
+    expect(screen.getByRole("button", { name: "Switch to dark theme" })).toBeInTheDocument();
+  });
+
+  it("calls toggleTheme when theme toggle button is clicked", async () => {
+    const user = userEvent.setup();
+    const toggleTheme = vi.fn();
+    renderWithCodeStore(<LivePreview htmlCode="" cssCode="" jsCode="" />, { theme: "dark", toggleTheme });
+    await user.click(screen.getByRole("button", { name: "Switch to light theme" }));
+    expect(toggleTheme).toHaveBeenCalledTimes(1);
+  });
 });

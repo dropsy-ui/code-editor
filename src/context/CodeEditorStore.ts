@@ -1,5 +1,10 @@
 import { createContext, useContext } from 'react';
 
+import type { AppTheme } from '../embed';
+export type { AppTheme };
+
+export type ResolvedTheme = "light" | "dark";
+
 export type CodeEditorStore = {
   htmlCode: string;
   cssCode: string;
@@ -10,6 +15,8 @@ export type CodeEditorStore = {
   logs: Array<{ level: string; message: string }>;
   addLog: (level: string, message: string) => void;
   clearLogs: () => void;
+  theme: ResolvedTheme;
+  toggleTheme: () => void;
 };
 
 export const CodeEditorStoreContext = createContext<CodeEditorStore | undefined>(undefined);

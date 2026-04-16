@@ -158,4 +158,47 @@ describe("App layout mode", () => {
     expect(screen.getByDisplayValue("body { color: teal; }")).toBeInTheDocument();
     expect(screen.getByDisplayValue("console.log('state')")).toBeInTheDocument();
   });
+
+  it("defaults to dark theme when no defaultTheme is given and system prefers dark", () => {
+    setSearch("");
+    vi.stubGlobal("matchMedia", (query: string) => ({ matches: query.includes("dark"), addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+    render(<App />);
+    expect(document.querySelector('[data-theme="dark"]')).toBeInTheDocument();
+    vi.unstubAllGlobals();
+  });
+
+  it("defaults to light theme when no defaultTheme is given and system prefers light", () => {
+    setSearch("");
+    vi.stubGlobal("matchMedia", (_query: string) => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+    render(<App />);
+    expect(document.querySelector('[data-theme="light"]')).toBeInTheDocument();
+    vi.unstubAllGlobals();
+  });
+
+  it("respects defaultTheme='dark' regardless of system preference", () => {
+    setSearch("");
+    vi.stubGlobal("matchMedia", (_query: string) => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+    render(<App defaultTheme="dark" />);
+    expect(document.querySelector('[data-theme="dark"]')).toBeInTheDocument();
+    vi.unstubAllGlobals();
+  });
+
+  it("respects defaultTheme='light' regardless of system preference", () => {
+    setSearch("");
+    vi.stubGlobal("matchMedia", (query: string) => ({ matches: query.includes("dark"), addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+    render(<App defaultTheme="light" />);
+    expect(document.querySelector('[data-theme="light"]')).toBeInTheDocument();
+    vi.unstubAllGlobals();
+  });
+
+  it("toggles theme when the theme toggle button is clicked", async () => {
+    const user = userEvent.setup();
+    setSearch("");
+    render(<App defaultTheme="dark" />);
+    expect(document.querySelector('[data-theme="dark"]')).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Switch to light theme" }));
+    expect(document.querySelector('[data-theme="light"]')).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Switch to dark theme" }));
+    expect(document.querySelector('[data-theme="dark"]')).toBeInTheDocument();
+  });
 });

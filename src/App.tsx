@@ -4,9 +4,12 @@ import CompactPreviewLayout from "./components/CompactPreviewLayout";
 import EditorsColumn from "./components/EditorsColumn";
 import PreviewSection from "./components/PreviewSection";
 import { CodeEditorStoreProvider } from "./context/CodeStoreContext";
+import { useCodeEditorStore } from "./context/CodeEditorStore";
 import { useSplitter } from "./hooks/useSplitter";
 import type { SandboxState } from "./utils/sandboxState";
 import "./splitter.scss";
+
+import type { AppTheme } from './embed';
 
 // Accept iframeScripts and iframeStyles as props for embedding
 interface AppProps {
@@ -18,6 +21,7 @@ interface AppProps {
   initialCssCode?: string;
   initialJsCode?: string;
   newWindowParams?: Record<string, string>;
+  defaultTheme?: AppTheme;
 }
 
 type LayoutMode = "full" | "compact";
@@ -39,6 +43,7 @@ function AppInner({
   layoutModeOverride,
   newWindowParams,
 }: AppProps) {
+  const { theme } = useCodeEditorStore();
   const [expanded, setExpanded] = useState({ html: true, js: true, css: true });
   const [urlLayoutMode] = useState<LayoutMode>(getInitialLayoutMode);
   const [isCompactCodeVisible, setIsCompactCodeVisible] = useState(false);
@@ -65,7 +70,7 @@ function AppInner({
   };
 
   return (
-    <div className={`app-body${isCompactMode ? " app-body--compact" : ""}`}>
+    <div className={`app-body${isCompactMode ? " app-body--compact" : ""}`} data-theme={theme}>
       {isDragging && !isCompactMode && (
         <div className="app-drag-overlay" />
       )}
@@ -124,6 +129,7 @@ function App(props: AppProps) {
     initialHtmlCode,
     initialCssCode,
     initialJsCode,
+    defaultTheme,
   } = props;
 
   const resolvedInitialHtmlCode = initialHtmlCode ?? initialState?.html ?? "";
@@ -135,6 +141,7 @@ function App(props: AppProps) {
       initialHtmlCode={resolvedInitialHtmlCode}
       initialCssCode={resolvedInitialCssCode}
       initialJsCode={resolvedInitialJsCode}
+      defaultTheme={defaultTheme}
     >
       <AppInner {...props} />
     </CodeEditorStoreProvider>

@@ -5,6 +5,8 @@ import './App.scss'; // Ensure global styles are included
 
 type DisplayMode = "compact" | "full";
 
+export type AppTheme = "light" | "dark" | "system";
+
 type CodeEditorOptions = {
   scripts?: string[];
   styles?: string[];
@@ -13,6 +15,8 @@ type CodeEditorOptions = {
   initialHtmlCode?: string;
   initialCssCode?: string;
   initialJsCode?: string;
+  /** Controls the editor colour scheme. Omit or pass "system" to follow the browser colour-scheme preference. */
+  defaultTheme?: AppTheme;
 } & Record<string, unknown>;
 
 type CodeEditorInit = (
@@ -37,6 +41,7 @@ globalWindow.CodeEditor = function (
       layoutModeOverride={options.displayMode}
       iframeScripts={options.scripts || []}
       iframeStyles={options.styles || []}
+      defaultTheme={options.defaultTheme}
     />
   );
 };
